@@ -1,50 +1,49 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
+import { useEffect, useState } from "react";
 import "./App.css";
+import Layout from "./components/layout/Layout";
+import CampaignSelector from "./pages/CampaignSelector";
+import { initializeDatabase } from "./services/database";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [dbInitialized, setDbInitialized] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+  useEffect(() => {
+    initializeDatabase()
+      .then(() => setDbInitialized(true))
+      .catch((err) => {
+        console.error("Database initialization failed:", err);
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        setError(`Failed to initialize database: ${errorMessage}. Please check if the application has correct permissions.`);
+      });
+  }, []);
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-4">
+        <div className="bg-red-900/20 border border-red-500 p-6 rounded-lg max-w-md w-full">
+          <h1 className="text-xl font-bold mb-4 text-red-400">Error</h1>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!dbInitialized) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p>Initializing GM Nexus...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    <Layout>
+      <CampaignSelector />
+    </Layout>
   );
 }
 
