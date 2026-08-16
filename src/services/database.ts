@@ -76,8 +76,19 @@ export const initializeDatabase = async () => {
   try {
     await database.execute('ALTER TABLE campaign_entities ADD COLUMN objectives TEXT');
   } catch (e) {
-    // Column might already exist, which is fine
+    // Column might already exist
   }
+
+  // Migration: Add columns to sessions table if they don't exist
+  try {
+    await database.execute('ALTER TABLE sessions ADD COLUMN sessionNumber INTEGER');
+    console.log('Added sessionNumber to sessions table');
+  } catch (e) { /* ignore if already exists */ }
+
+  try {
+    await database.execute('ALTER TABLE sessions ADD COLUMN isActive BOOLEAN DEFAULT 0');
+    console.log('Added isActive to sessions table');
+  } catch (e) { /* ignore if already exists */ }
 
   await database.execute(`
     CREATE TABLE IF NOT EXISTS inbox_entries (
@@ -123,10 +134,51 @@ export const initializeDatabase = async () => {
       id TEXT PRIMARY KEY,
       campaignId TEXT NOT NULL,
       name TEXT NOT NULL,
+      sessionNumber INTEGER,
       startDate DATETIME DEFAULT CURRENT_TIMESTAMP,
       endDate DATETIME,
+      isActive BOOLEAN DEFAULT 0,
       notes TEXT,
       FOREIGN KEY (campaignId) REFERENCES campaigns (id) ON DELETE CASCADE
+    );
+  `);
+
+  await database.execute(`
+    CREATE TABLE IF NOT EXISTS session_events (
+      id TEXT PRIMARY KEY,
+      sessionId TEXT NOT NULL,
+      text TEXT NOT NULL,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (sessionId) REFERENCES sessions (id) ON DELETE CASCADE
+    );
+  `);
+
+  await database.execute(`
+    CREATE TABLE IF NOT EXISTS status_effects (
+      id TEXT PRIMARY KEY,
+      playerId TEXT NOT NULL,
+      name TEXT NOT NULL,
+      description TEXT,
+      icon TEXT,
+      duration TEXT,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (playerId) REFERENCES players (id) ON DELETE CASCADE
+    );
+  `);
+
+  await database.execute(`
+    CREATE TABLE IF NOT EXISTS resource_history (
+      id TEXT PRIMARY KEY,
+      playerId TEXT NOT NULL,
+      resourceId TEXT NOT NULL,
+      sessionId TEXT,
+      previousValue INTEGER NOT NULL,
+      newValue INTEGER NOT NULL,
+      change INTEGER NOT NULL,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (playerId) REFERENCES players (id) ON DELETE CASCADE,
+      FOREIGN KEY (resourceId) REFERENCES player_resources (id) ON DELETE CASCADE,
+      FOREIGN KEY (sessionId) REFERENCES sessions (id) ON DELETE SET NULL
     );
   `);
 };

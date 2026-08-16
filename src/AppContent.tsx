@@ -9,6 +9,8 @@ import EntityManager from "./pages/EntityManager";
 import EntityDetail from "./pages/EntityDetail";
 import InboxManagement from "./pages/InboxManagement";
 import NotesManagement from "./pages/NotesManagement";
+import PlayerManagement from "./pages/PlayerManagement";
+import PlayingPage from "./pages/PlayingPage";
 
 const AppContent: React.FC = () => {
   const { activeCampaign, currentView } = useAppContext();
@@ -57,6 +59,10 @@ const AppContent: React.FC = () => {
         return <NotesManagement campaign={activeCampaign} />;
       case 'Inbox':
         return <InboxManagement campaign={activeCampaign} />;
+      case 'Playing':
+        return <PlayingPage />;
+      case 'Players':
+        return <PlayerManagement />;
       default:
         return <CampaignOverview campaign={activeCampaign} />;
     }

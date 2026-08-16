@@ -85,7 +85,37 @@ export interface Session {
   id: string;
   campaignId: string;
   name: string;
+  sessionNumber?: number;
   startDate: string;
   endDate?: string;
+  isActive: boolean;
   notes?: string;
+}
+
+export interface SessionEvent {
+  id: string;
+  sessionId: string;
+  text: string;
+  timestamp: string;
+}
+
+export interface StatusEffect {
+  id: string;
+  playerId: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  duration?: string;
+  createdAt: string;
+}
+
+export interface ResourceHistory {
+  id: string;
+  playerId: string;
+  resourceId: string;
+  sessionId?: string;
+  previousValue: number;
+  newValue: number;
+  change: number;
+  timestamp: string;
 }

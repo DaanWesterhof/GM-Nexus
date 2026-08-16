@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Campaign, CampaignEntity } from '../types';
+import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
+import { Campaign, CampaignEntity, Session, Player } from '../types';
+import { playerService } from '../services/playerService';
+import { sessionService } from '../services/sessionService';
 
-export type View = 'Overview' | 'NPCs' | 'Locations' | 'Quests' | 'Factions' | 'Notes' | 'Inbox' | 'EntityDetail';
+export type View = 'Overview' | 'NPCs' | 'Locations' | 'Quests' | 'Factions' | 'Notes' | 'Inbox' | 'EntityDetail' | 'Playing' | 'Players';
 
 interface AppContextType {
   activeCampaign: Campaign | null;
@@ -10,6 +12,11 @@ interface AppContextType {
   setCurrentView: (view: View) => void;
   selectedEntity: CampaignEntity | null;
   setSelectedEntity: (entity: CampaignEntity | null) => void;
+  activeSession: Session | null;
+  setActiveSession: (session: Session | null) => void;
+  players: Player[];
+  setPlayers: (players: Player[]) => void;
+  refreshPlayers: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -18,10 +25,37 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [activeCampaign, setActiveCampaign] = useState<Campaign | null>(null);
   const [currentView, setCurrentView] = useState<View>('Overview');
   const [selectedEntity, setSelectedEntity] = useState<CampaignEntity | null>(null);
+  const [activeSession, setActiveSession] = useState<Session | null>(null);
+  const [players, setPlayers] = useState<Player[]>([]);
+
+  const refreshPlayers = useCallback(async () => {
+    if (activeCampaign) {
+      const p = await playerService.getByCampaign(activeCampaign.id);
+      setPlayers(p);
+    } else {
+      setPlayers([]);
+    }
+  }, [activeCampaign]);
+
+  const refreshActiveSession = useCallback(async () => {
+    if (activeCampaign) {
+      const session = await sessionService.getActiveSession(activeCampaign.id);
+      setActiveSession(session);
+    } else {
+      setActiveSession(null);
+    }
+  }, [activeCampaign]);
+
+  useEffect(() => {
+    refreshPlayers();
+    refreshActiveSession();
+  }, [refreshPlayers, refreshActiveSession]);
 
   const handleSetActiveCampaign = (campaign: Campaign | null) => {
     setActiveCampaign(campaign);
     setSelectedEntity(null);
+    setActiveSession(null);
+    setPlayers([]);
     if (campaign) {
       setCurrentView('Overview');
     }
@@ -41,7 +75,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       currentView, 
       setCurrentView,
       selectedEntity,
-      setSelectedEntity: handleSetSelectedEntity
+      setSelectedEntity: handleSetSelectedEntity,
+      activeSession,
+      setActiveSession,
+      players,
+      setPlayers,
+      refreshPlayers
     }}>
       {children}
     </AppContext.Provider>

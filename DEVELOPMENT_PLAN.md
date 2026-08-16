@@ -111,33 +111,44 @@ State management will be handled in the React frontend using a combination of:
    - **Utility Tools**: Campaign-wide search (Ctrl+K), Quick Add, and Campaign Inbox.
    - **Notes**: Persistent campaign-wide notes with dedicated editor.
    - **Persistence**: All data stored in SQLite via Tauri's SQL plugin.
-3. **Phase 3: Live Play**
+3. **Phase 3: Live Play (Completed)**
    - Player management and resource tracking.
    - Session management and event logging.
+   - Playing screen with player cards and health controls.
+   - Quick status effect management.
+   - Campaign Book integration in live play.
 4. **Phase 4: OBS Overlay**
    - WebSocket server implementation.
    - Basic OBS overlay template.
    - Real-time state synchronization.
 
-## 7. Phase 2 Implementation Details
+## 7. Phase 3 Implementation Details
 
 ### Database Changes
-- Added `inbox_entries` table.
-- Added `notes` table.
-- Added `objectives` column to `campaign_entities` (for future Quest objective refinement).
-- Refined `relationships` handling to be fully generic across all entity types.
+- Added `session_events` table for tracking live events.
+- Added `status_effects` table for player conditions.
+- Added `resource_history` table for tracking health/resource changes.
+- Updated `sessions` table with `isActive`, `sessionNumber`, and `endDate`.
 
-### Architectural Improvements
-- **AppContext**: Centralized state for active campaign, current view, and selected entity.
-- **Service Layer Expansion**: Dedicated services for entities, relationships, and campaign content (Inbox/Notes).
-- **Reusable Components**: `EntityModal` and `EntityManager` ensure consistent UX across different data types.
+### State-management changes
+- `AppContext` expanded to include `activeSession` and `players` list.
+- Automatic player and session refreshing on campaign load.
 
-### Known Limitations (Phase 2)
-- Images currently use text paths; integration with Tauri's filesystem for binary storage is planned for Phase 3.
-- Quest objectives are currently stored as a JSON string in the DB; UI for granular objective management is pending.
-- Notes are plain text; Markdown rendering to be added.
+### New Components
+- `PlayingPage`: The main live dashboard for GMs.
+- `PlayerCard`: Interactive card for each player with health buttons and status display.
+- `PlayerManagement`: Dedicated page for configuring players and their resources.
+- `HealthControls`: Integrated quick-change buttons (-10, -3, -1, +1, +3, +10).
 
-## 7. Testing Strategy
+### Architectural Considerations for Phase 4
+- `playerService.updateResource` now records history, providing a hook for OBS broadcasts.
+- `AppContext` serves as the single source of truth for the live playing state, which the WebSocket server will subscribe to.
+
+### Known Limitations
+- Status icons are currently text-based; a full icon selector is planned for later.
+- Campaign Book in Playing screen is currently a navigation-focused sidebar; deep linking to specific entities within it is basic.
+
+## 8. Testing Strategy
 
 - **Unit Tests**: For core business logic and data transformations (Vitest).
 - **Integration Tests**: For repository layer and SQLite interactions.

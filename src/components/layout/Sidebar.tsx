@@ -3,11 +3,19 @@ import { useAppContext, View } from '../../store/AppContext';
 import QuickAddModal from '../common/QuickAddModal';
 import { EntityType } from '../../types';
 
+interface NavItem {
+  view: View;
+  label: string;
+  icon: string;
+  isPage?: boolean;
+}
+
 const Sidebar: React.FC = () => {
   const { currentView, setCurrentView, setActiveCampaign } = useAppContext();
   const [quickAddType, setQuickAddType] = useState<EntityType | null>(null);
 
-  const navItems: { view: View; label: string; icon: string }[] = [
+  const navItems: NavItem[] = [
+    { view: 'Playing', label: 'Playing', icon: '🎮' },
     { view: 'Overview', label: 'Overview', icon: '🏠' },
     { view: 'NPCs', label: 'NPCs', icon: '👤' },
     { view: 'Locations', label: 'Locations', icon: '📍' },
@@ -15,6 +23,10 @@ const Sidebar: React.FC = () => {
     { view: 'Factions', label: 'Factions', icon: '🛡️' },
     { view: 'Notes', label: 'Notes', icon: '📝' },
     { view: 'Inbox', label: 'Inbox', icon: '📥' },
+  ];
+
+  const extraItems: NavItem[] = [
+    { view: 'Players' as any, label: 'Players', icon: '👥', isPage: true }
   ];
 
   const quickAddItems: { type: EntityType; icon: string }[] = [
@@ -53,6 +65,24 @@ const Sidebar: React.FC = () => {
             <span>{item.label}</span>
           </button>
         ))}
+
+        <div className="pt-4 pb-2">
+          <div className="text-[10px] font-bold text-gray-600 uppercase tracking-widest px-4 mb-2">Campaign Tools</div>
+          {extraItems.map((item) => (
+            <button
+              key={item.view}
+              onClick={() => setCurrentView(item.view)}
+              className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg transition-all text-sm font-medium ${
+                currentView === item.view
+                  ? 'bg-gray-700 text-white'
+                  : 'text-gray-500 hover:bg-gray-700/50 hover:text-gray-300'
+              }`}
+            >
+              <span className="text-base">{item.icon}</span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
       </nav>
 
       <div className="p-4 border-t border-gray-700 space-y-4">
