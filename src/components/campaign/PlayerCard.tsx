@@ -83,6 +83,57 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
 
   const health = resources.find(r => r.name.toLowerCase() === 'health' || r.name.toLowerCase() === 'hp');
   const otherResources = resources.filter(r => r.id !== health?.id);
+  
+  const renderResource = (res: PlayerResource, isHealth: boolean = false) => {
+    return (
+      <div key={res.id} className="space-y-2">
+        <div className="flex justify-between items-end">
+          <span className={`text-xs font-bold uppercase tracking-widest ${isHealth ? 'text-gray-500' : 'text-blue-400'}`}>
+            {res.name}
+          </span>
+          <div className="flex items-center space-x-1">
+            <input 
+              type="number"
+              value={res.currentValue}
+              onChange={(e) => handleDirectEdit(res.id, e.target.value)}
+              className="w-12 bg-transparent text-right font-bold text-xl text-white focus:outline-none focus:bg-gray-700 rounded"
+            />
+            <span className="text-gray-500 text-sm">/ {res.maxValue}</span>
+          </div>
+        </div>
+        
+        {/* Resource Bar */}
+        <div className="h-4 bg-gray-900 rounded-full overflow-hidden border border-gray-700">
+          <div 
+            className={`h-full transition-all duration-300 ${
+              isHealth 
+                ? ((res.currentValue / res.maxValue) < 0.25 ? 'bg-red-500' :
+                   (res.currentValue / res.maxValue) < 0.5 ? 'bg-yellow-500' : 'bg-green-500')
+                : 'bg-blue-500'
+            }`}
+            style={{ width: `${(res.currentValue / res.maxValue) * 100}%` }}
+          />
+        </div>
+
+        {/* Quick Buttons */}
+        <div className="grid grid-cols-6 gap-1 mt-2">
+          {[-10, -3, -1, 1, 3, 10].map(delta => (
+            <button
+              key={delta}
+              onClick={() => handleHealthChange(res.id, delta)}
+              className={`py-2 rounded-lg text-xs font-bold transition-all ${
+                delta < 0 
+                  ? 'bg-red-900/20 text-red-400 hover:bg-red-900/40 border border-red-900/30' 
+                  : 'bg-green-900/20 text-green-400 hover:bg-green-900/40 border border-green-900/30'
+              }`}
+            >
+              {delta > 0 ? `+${delta}` : delta}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="bg-gray-800 border-2 border-gray-700 rounded-2xl overflow-hidden shadow-xl flex flex-col h-full">
@@ -98,80 +149,14 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
         </div>
       </div>
 
-      <div className="p-4 flex-1 flex flex-col space-y-4">
+      <div className="p-4 flex-1 flex flex-col space-y-6">
         {/* Health Section */}
-        {health && (
-          <div className="space-y-2">
-            <div className="flex justify-between items-end">
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Health</span>
-              <div className="flex items-center space-x-1">
-                <input 
-                  type="number"
-                  value={health.currentValue}
-                  onChange={(e) => handleDirectEdit(health.id, e.target.value)}
-                  className="w-12 bg-transparent text-right font-bold text-xl text-white focus:outline-none focus:bg-gray-700 rounded"
-                />
-                <span className="text-gray-500 text-sm">/ {health.maxValue}</span>
-              </div>
-            </div>
-            
-            {/* Health Bar */}
-            <div className="h-4 bg-gray-900 rounded-full overflow-hidden border border-gray-700">
-              <div 
-                className={`h-full transition-all duration-300 ${
-                  (health.currentValue / health.maxValue) < 0.25 ? 'bg-red-500' :
-                  (health.currentValue / health.maxValue) < 0.5 ? 'bg-yellow-500' : 'bg-green-500'
-                }`}
-                style={{ width: `${(health.currentValue / health.maxValue) * 100}%` }}
-              />
-            </div>
-
-            {/* Quick Health Buttons */}
-            <div className="grid grid-cols-6 gap-1 mt-2">
-              {[-10, -3, -1, 1, 3, 10].map(delta => (
-                <button
-                  key={delta}
-                  onClick={() => handleHealthChange(health.id, delta)}
-                  className={`py-2 rounded-lg text-xs font-bold transition-all ${
-                    delta < 0 
-                      ? 'bg-red-900/20 text-red-400 hover:bg-red-900/40 border border-red-900/30' 
-                      : 'bg-green-900/20 text-green-400 hover:bg-green-900/40 border border-green-900/30'
-                  }`}
-                >
-                  {delta > 0 ? `+${delta}` : delta}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        {health && renderResource(health, true)}
 
         {/* Other Resources */}
         {otherResources.length > 0 && (
-          <div className="grid grid-cols-2 gap-2">
-            {otherResources.map(res => (
-              <div key={res.id} className="bg-gray-900/50 p-2 rounded-lg border border-gray-700/50">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-[10px] font-bold text-gray-500 uppercase">{res.name}</span>
-                  <span className="text-xs font-bold text-white">{res.currentValue} / {res.maxValue}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button 
-                    onClick={() => handleHealthChange(res.id, -1)}
-                    className="w-6 h-6 flex items-center justify-center bg-gray-700 rounded text-xs hover:bg-gray-600"
-                  >-</button>
-                  <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-blue-500"
-                      style={{ width: `${(res.currentValue / res.maxValue) * 100}%` }}
-                    />
-                  </div>
-                  <button 
-                    onClick={() => handleHealthChange(res.id, 1)}
-                    className="w-6 h-6 flex items-center justify-center bg-gray-700 rounded text-xs hover:bg-gray-600"
-                  >+</button>
-                </div>
-              </div>
-            ))}
+          <div className="space-y-6">
+            {otherResources.map(res => renderResource(res, false))}
           </div>
         )}
 
