@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useAppContext, View } from '../store/AppContext';
+import { useAppContext } from '../store/AppContext';
 import { sessionService } from '../services/sessionService';
 import { entityService } from '../services/entityService';
 import PlayerCard from '../components/campaign/PlayerCard';
 import { SessionEvent, EntityType, CampaignEntity } from '../types';
 import QuickAddModal from '../components/common/QuickAddModal';
-import { obsService } from '../services/obsService';
 
 const PlayingPage: React.FC = () => {
   const { activeCampaign, activeSession, setActiveSession, players, setCurrentView, setSelectedEntity, entitiesRefreshTrigger } = useAppContext();

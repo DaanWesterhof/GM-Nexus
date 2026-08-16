@@ -49,7 +49,7 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
 
   const handleFinalSave = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({ name, description, notes, status, parentId, image }, pendingRelationships);
+    onSave({ name, description, notes, status, parentId, image: image || undefined }, pendingRelationships);
     onClose();
   };
 
@@ -168,7 +168,7 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
                         src={image.startsWith('http') ? image : convertFileSrc(image)} 
                         alt="Preview" 
                         className="w-full h-full object-contain"
-                        onError={(e) => console.error("Preview load error", image)}
+                        onError={() => console.error("Preview load error", image)}
                       />
                     </div>
                   )}

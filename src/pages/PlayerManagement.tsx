@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Player, PlayerResource } from '../types';
+import { Player } from '../types';
 import { playerService } from '../services/playerService';
 import { useAppContext } from '../store/AppContext';
 import { open } from '@tauri-apps/plugin-dialog';
@@ -245,8 +245,8 @@ const PlayerManagement: React.FC = () => {
                   src={player.image.startsWith('http') ? player.image : convertFileSrc(player.image)} 
                   alt={player.name} 
                   className="w-full h-full object-cover" 
-                  onError={(e) => {
-                    console.error("Image load error for:", player.image, "Converted:", convertFileSrc(player.image));
+                  onError={() => {
+                    console.error("Image load error for:", player.image, "Converted:", player.image ? convertFileSrc(player.image) : "undefined");
                     // Optional: set a fallback image or state
                   }}
                 />

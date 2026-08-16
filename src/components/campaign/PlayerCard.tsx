@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Player, PlayerResource, StatusEffect } from '../../types';
 import { playerService } from '../../services/playerService';
-import { useAppContext } from '../../store/AppContext';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { obsService } from '../../services/obsService';
 
@@ -176,7 +175,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
             src={player.image.startsWith('http') ? player.image : convertFileSrc(player.image)} 
             alt={player.name} 
             className="w-full h-full object-cover" 
-            onError={(e) => console.error("PlayerCard image load error for:", player.image, "Converted:", convertFileSrc(player.image))}
+            onError={() => console.error("PlayerCard image load error for:", player.image, "Converted:", player.image ? convertFileSrc(player.image) : "undefined")}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-600 text-6xl">👤</div>

@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Player, PlayerResource, StatusEffect } from './types';
-import { playerService } from './services/playerService';
 
 interface OverlayState {
   players: (Player & {

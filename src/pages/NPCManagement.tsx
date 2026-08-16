@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Campaign, CampaignEntity } from '../types';
+import { Campaign, CampaignEntity, Relationship } from '../types';
 import { entityService } from '../services/entityService';
 import EntityModal from '../components/common/EntityModal';
 

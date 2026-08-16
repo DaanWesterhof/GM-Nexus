@@ -1,0 +1,44 @@
+What looks implemented already:
+• campaign creation / editing / deletion / selection
+• local SQLite persistence
+• NPCs, locations, quests, factions
+• notes and inbox
+• relationships
+• campaign overview/dashboard
+• quick add
+• campaign search
+• players
+• player images
+• health, quick health controls, status effects
+• session start/end, event logging, session history
+• playing screen with campaign-book drawer
+• basic OBS overlay + WebSocket sync
+What still appears missing or only partially done:
+• relationship graph
+• backlinks
+• advanced command palette
+• campaign timeline
+• session recap generation
+• automatic backups
+• export/import
+• undo/redo
+• GM pins
+• advanced OBS layouts
+• OBS themes
+• custom animations
+• player-facing campaign portal
+• multiplayer GM collaboration
+• cloud synchronization
+• character sheets
+• initiative tracking
+• NPC combat tracking
+• inventory
+• maps / battle maps
+• dice rolling
+• voice/video
+• full VTT functionality
+Partially implemented, but not at the level the design doc describes:
+• global search: you have search, but not the richer command-palette-style experience the doc talks about
+• campaign book from playing screen: implemented as a side drawer, but not a full separate navigation model
+• OBS support: basic overlay and sync are there, but not the more advanced configuration/layout/theme system
+• player card customization: the current player cards are functional, but not deeply customizable

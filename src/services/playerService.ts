@@ -1,5 +1,5 @@
 import { getDatabase } from './database';
-import { Player, PlayerResource, StatusEffect, ResourceHistory } from '../types';
+import { Player, PlayerResource, StatusEffect } from '../types';
 
 export const playerService = {
   async getByCampaign(campaignId: string): Promise<Player[]> {
