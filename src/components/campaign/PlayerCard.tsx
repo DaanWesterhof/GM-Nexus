@@ -3,6 +3,7 @@ import { Player, PlayerResource, StatusEffect } from '../../types';
 import { playerService } from '../../services/playerService';
 import { useAppContext } from '../../store/AppContext';
 import { convertFileSrc } from '@tauri-apps/api/core';
+import { obsService } from '../../services/obsService';
 
 interface PlayerCardProps {
   player: Player;
@@ -41,9 +42,19 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
     await playerService.updateResource(resourceId, newValue, activeSessionId);
     
     // Optimistic update
-    setResources(resources.map(r => 
+    const updatedResources = resources.map(r => 
       r.id === resourceId ? { ...r, currentValue: newValue } : r
-    ));
+    );
+    setResources(updatedResources);
+
+    // Broadcast to OBS
+    obsService.broadcastState({
+      players: [{
+        ...player,
+        resources: updatedResources,
+        statusEffects
+      }]
+    });
   };
 
   const handleDirectEdit = async (resourceId: string, value: string) => {
@@ -58,9 +69,19 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
     if (newValue > resource.maxValue) newValue = resource.maxValue;
 
     await playerService.updateResource(resourceId, newValue, activeSessionId);
-    setResources(resources.map(r => 
+    const updatedResources = resources.map(r => 
       r.id === resourceId ? { ...r, currentValue: newValue } : r
-    ));
+    );
+    setResources(updatedResources);
+
+    // Broadcast to OBS
+    obsService.broadcastState({
+      players: [{
+        ...player,
+        resources: updatedResources,
+        statusEffects
+      }]
+    });
   };
 
   const handleAddStatus = async () => {
@@ -74,12 +95,22 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
     
     setNewStatusName('');
     setShowStatusModal(false);
-    loadPlayerData();
+    await loadPlayerData();
+    
+    // Broadcast full sync after status change to ensure OBS is up to date
+    if (player.campaignId) {
+      obsService.broadcastFullSync(player.campaignId);
+    }
   };
 
   const handleRemoveStatus = async (statusId: string) => {
     await playerService.removeStatusEffect(statusId);
-    loadPlayerData();
+    await loadPlayerData();
+
+    // Broadcast full sync
+    if (player.campaignId) {
+      obsService.broadcastFullSync(player.campaignId);
+    }
   };
 
   const health = resources.find(r => r.name.toLowerCase() === 'health' || r.name.toLowerCase() === 'hp');

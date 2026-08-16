@@ -87,6 +87,15 @@ const Sidebar: React.FC = () => {
       </nav>
 
       <div className="p-4 border-t border-gray-700 space-y-4">
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText('http://localhost:1420/overlay.html');
+            alert('OBS Browser Source URL copied to clipboard!');
+          }}
+          className="w-full flex items-center justify-center space-x-2 py-2 bg-blue-900/20 border border-blue-900/50 text-blue-400 rounded-lg text-xs font-bold hover:bg-blue-900/40 transition-all mb-2"
+        >
+          <span>🔗 Copy Overlay URL</span>
+        </button>
         <div className="text-xs font-bold text-gray-500 uppercase tracking-widest px-4">
           Quick Add
         </div>

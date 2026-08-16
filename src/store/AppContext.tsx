@@ -3,6 +3,9 @@ import { Campaign, CampaignEntity, Session, Player } from '../types';
 import { playerService } from '../services/playerService';
 import { sessionService } from '../services/sessionService';
 
+import { obsService } from '../services/obsService';
+import { listen } from '@tauri-apps/api/event';
+
 export type View = 'Overview' | 'NPCs' | 'Locations' | 'Quests' | 'Factions' | 'Notes' | 'Inbox' | 'EntityDetail' | 'Playing' | 'Players' | 'History';
 
 interface AppContextType {
@@ -57,6 +60,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     refreshPlayers();
     refreshActiveSession();
   }, [refreshPlayers, refreshActiveSession, entitiesRefreshTrigger]);
+
+  useEffect(() => {
+    if (activeCampaign) {
+      const unlisten = listen('ws-client-connected', () => {
+        obsService.broadcastFullSync(activeCampaign.id);
+      });
+      
+      return () => {
+        unlisten.then(f => f());
+      };
+    }
+  }, [activeCampaign]);
 
   const handleSetActiveCampaign = (campaign: Campaign | null) => {
     setActiveCampaign(campaign);
