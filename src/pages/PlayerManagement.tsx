@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Player, PlayerResource } from '../types';
 import { playerService } from '../services/playerService';
 import { useAppContext } from '../store/AppContext';
+import { open } from '@tauri-apps/plugin-dialog';
+import { convertFileSrc } from '@tauri-apps/api/core';
+import { saveImageToAppFolder } from '../utils/fileUtils';
 
 const PlayerManagement: React.FC = () => {
   const { activeCampaign, refreshPlayers, players } = useAppContext();
@@ -33,6 +36,24 @@ const PlayerManagement: React.FC = () => {
     const res = await playerService.getResources(playerId);
     if (res.length > 0) {
       setResources(res.map(r => ({ name: r.name, max: r.maxValue, style: r.displayStyle })));
+    }
+  };
+
+  const handleSelectImage = async () => {
+    try {
+      const selected = await open({
+        multiple: false,
+        filters: [{
+          name: 'Image',
+          extensions: ['png', 'jpg', 'jpeg', 'webp']
+        }]
+      });
+      if (selected) {
+        const savedPath = await saveImageToAppFolder(selected as string);
+        setImage(savedPath);
+      }
+    } catch (error) {
+      console.error('Failed to select image:', error);
     }
   };
 
@@ -125,12 +146,25 @@ const PlayerManagement: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-1">Image URL/Path</label>
-                <input
-                  type="text"
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
-                />
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    value={image}
+                    onChange={(e) => setImage(e.target.value)}
+                    className="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+                    placeholder="https://... or C:\..."
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSelectImage}
+                    className="p-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center"
+                    title="Select image file"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -207,7 +241,15 @@ const PlayerManagement: React.FC = () => {
           <div key={player.id} className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden group">
             <div className="h-32 bg-gray-700 relative overflow-hidden">
               {player.image ? (
-                <img src={player.image} alt={player.name} className="w-full h-full object-cover" />
+                <img 
+                  src={player.image.startsWith('http') ? player.image : convertFileSrc(player.image)} 
+                  alt={player.name} 
+                  className="w-full h-full object-cover" 
+                  onError={(e) => {
+                    console.error("Image load error for:", player.image, "Converted:", convertFileSrc(player.image));
+                    // Optional: set a fallback image or state
+                  }}
+                />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-500 text-4xl">
                   👤

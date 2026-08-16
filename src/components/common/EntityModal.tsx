@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { EntityType, CampaignEntity, QuestStatus } from '../../types';
+import { EntityType, CampaignEntity, QuestStatus, Relationship } from '../../types';
+import { open } from '@tauri-apps/plugin-dialog';
+import { convertFileSrc } from '@tauri-apps/api/core';
+import { saveImageToAppFolder } from '../../utils/fileUtils';
 
 import RelationshipEditor from './RelationshipEditor';
 
@@ -19,6 +22,7 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
   const [notes, setNotes] = useState('');
   const [status, setStatus] = useState<QuestStatus>('Planned');
   const [parentId, setParentId] = useState<string | undefined>(undefined);
+  const [image, setImage] = useState<string | null>(null);
   const [pendingRelationships, setPendingRelationships] = useState<{ added: Partial<Relationship>[], deletedIds: string[] }>({ added: [], deletedIds: [] });
 
   useEffect(() => {
@@ -29,12 +33,14 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
       setNotes(initialData.notes || '');
       setStatus(initialData.status || 'Planned');
       setParentId(initialData.parentId);
+      setImage(initialData.image || null);
     } else {
       setName('');
       setDescription('');
       setNotes('');
       setStatus('Planned');
       setParentId(undefined);
+      setImage(null);
     }
     setPendingRelationships({ added: [], deletedIds: [] });
   }, [initialData, isOpen]);
@@ -43,8 +49,26 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
 
   const handleFinalSave = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({ name, description, notes, status, parentId }, pendingRelationships);
+    onSave({ name, description, notes, status, parentId, image }, pendingRelationships);
     onClose();
+  };
+
+  const handleSelectImage = async () => {
+    try {
+      const selected = await open({
+        multiple: false,
+        filters: [{
+          name: 'Image',
+          extensions: ['png', 'jpg', 'jpeg', 'webp']
+        }]
+      });
+      if (selected) {
+        const savedPath = await saveImageToAppFolder(selected as string);
+        setImage(savedPath);
+      }
+    } catch (error) {
+      console.error('Failed to select image:', error);
+    }
   };
 
   return (
@@ -114,6 +138,41 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
                     </select>
                   </div>
                 )}
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Image</label>
+                  <div className="flex space-x-2">
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={image || ''}
+                        onChange={(e) => setImage(e.target.value)}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                        placeholder="Image URL or Path"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleSelectImage}
+                      className="px-4 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center"
+                      title="Select image file"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                      </svg>
+                    </button>
+                  </div>
+                  {image && (
+                    <div className="mt-2 h-32 w-full rounded-lg overflow-hidden border border-gray-700 bg-gray-900">
+                      <img 
+                        src={image.startsWith('http') ? image : convertFileSrc(image)} 
+                        alt="Preview" 
+                        className="w-full h-full object-contain"
+                        onError={(e) => console.error("Preview load error", image)}
+                      />
+                    </div>
+                  )}
+                </div>
 
                 <div>
                   <label className="block text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Description</label>

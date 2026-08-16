@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Player, PlayerResource, StatusEffect } from '../../types';
 import { playerService } from '../../services/playerService';
 import { useAppContext } from '../../store/AppContext';
+import { convertFileSrc } from '@tauri-apps/api/core';
 
 interface PlayerCardProps {
   player: Player;
@@ -140,7 +141,12 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
       {/* Portrait and Name */}
       <div className="relative h-48 bg-gray-700">
         {player.image ? (
-          <img src={player.image} alt={player.name} className="w-full h-full object-cover" />
+          <img 
+            src={player.image.startsWith('http') ? player.image : convertFileSrc(player.image)} 
+            alt={player.name} 
+            className="w-full h-full object-cover" 
+            onError={(e) => console.error("PlayerCard image load error for:", player.image, "Converted:", convertFileSrc(player.image))}
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-600 text-6xl">👤</div>
         )}
