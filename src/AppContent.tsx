@@ -11,6 +11,7 @@ import InboxManagement from "./pages/InboxManagement";
 import NotesManagement from "./pages/NotesManagement";
 import PlayerManagement from "./pages/PlayerManagement";
 import PlayingPage from "./pages/PlayingPage";
+import SessionHistory from "./pages/SessionHistory";
 
 const AppContent: React.FC = () => {
   const { activeCampaign, currentView } = useAppContext();
@@ -63,6 +64,8 @@ const AppContent: React.FC = () => {
         return <PlayingPage />;
       case 'Players':
         return <PlayerManagement />;
+      case 'History':
+        return <SessionHistory campaign={activeCampaign} />;
       default:
         return <CampaignOverview campaign={activeCampaign} />;
     }

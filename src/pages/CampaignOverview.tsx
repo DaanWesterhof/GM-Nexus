@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Campaign, CampaignEntity } from '../types';
+import { Campaign, CampaignEntity, EntityType } from '../types';
 import { entityService } from '../services/entityService';
+import QuickAddModal from '../components/common/QuickAddModal';
+import { useAppContext } from '../store/AppContext';
 
 interface CampaignOverviewProps {
   campaign: Campaign;
 }
 
 const CampaignOverview: React.FC<CampaignOverviewProps> = ({ campaign }) => {
+  const { setCurrentView, setSelectedEntity } = useAppContext();
   const [stats, setStats] = useState({ npcs: 0, locations: 0, quests: 0, factions: 0 });
   const [recentEntities, setRecentEntities] = useState<CampaignEntity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [quickAddType, setQuickAddType] = useState<EntityType | null>(null);
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -70,12 +74,21 @@ const CampaignOverview: React.FC<CampaignOverviewProps> = ({ campaign }) => {
         <section className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-700 bg-gray-800/50 flex justify-between items-center">
             <h3 className="font-bold text-white uppercase tracking-wider text-sm">Recent Entities</h3>
-            <button className="text-xs text-blue-400 hover:text-blue-300 transition-colors">View All</button>
+            <button 
+              onClick={() => setCurrentView('NPCs')} 
+              className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              View All
+            </button>
           </div>
           <div className="divide-y divide-gray-700">
             {recentEntities.length > 0 ? (
               recentEntities.map((entity) => (
-                <div key={entity.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-750 transition-colors cursor-pointer group">
+                <div 
+                  key={entity.id} 
+                  onClick={() => setSelectedEntity(entity)}
+                  className="px-6 py-4 flex items-center justify-between hover:bg-gray-750 transition-colors cursor-pointer group"
+                >
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs text-gray-400 group-hover:bg-blue-900/30 group-hover:text-blue-300 transition-colors">
                       {entity.type.substring(0, 1)}
@@ -99,9 +112,10 @@ const CampaignOverview: React.FC<CampaignOverviewProps> = ({ campaign }) => {
         <section className="space-y-4">
           <h3 className="font-bold text-white uppercase tracking-wider text-sm mb-2">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-4">
-            {['NPC', 'Location', 'Quest', 'Faction', 'Note'].map((type) => (
+            {['NPC', 'Location', 'Quest', 'Faction'].map((type) => (
               <button
                 key={type}
+                onClick={() => setQuickAddType(type as EntityType)}
                 className="flex items-center space-x-3 bg-gray-800 border border-gray-700 p-4 rounded-xl hover:bg-gray-750 hover:border-blue-500/50 transition-all group"
               >
                 <div className="w-10 h-10 rounded-lg bg-gray-700 flex items-center justify-center text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
@@ -112,9 +126,26 @@ const CampaignOverview: React.FC<CampaignOverviewProps> = ({ campaign }) => {
                 <span className="text-white font-medium text-sm">Add {type}</span>
               </button>
             ))}
+            <button
+              onClick={() => setCurrentView('Notes')}
+              className="flex items-center space-x-3 bg-gray-800 border border-gray-700 p-4 rounded-xl hover:bg-gray-750 hover:border-blue-500/50 transition-all group"
+            >
+              <div className="w-10 h-10 rounded-lg bg-gray-700 flex items-center justify-center text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </div>
+              <span className="text-white font-medium text-sm">Add Note</span>
+            </button>
           </div>
         </section>
       </div>
+
+      <QuickAddModal 
+        type={quickAddType || 'NPC'} 
+        isOpen={!!quickAddType} 
+        onClose={() => setQuickAddType(null)} 
+      />
     </div>
   );
 };

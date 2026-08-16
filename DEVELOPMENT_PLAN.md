@@ -135,10 +135,10 @@ State management will be handled in the React frontend using a combination of:
 - Automatic player and session refreshing on campaign load.
 
 ### New Components
-- `PlayingPage`: The main live dashboard for GMs.
 - `PlayerCard`: Interactive card for each player with health buttons and status display.
 - `PlayerManagement`: Dedicated page for configuring players and their resources.
 - `HealthControls`: Integrated quick-change buttons (-10, -3, -1, +1, +3, +10).
+- `PlayingPage`: The main live dashboard for GMs, featuring a slide-over Campaign Book with simplified entity browsing and quick-add functionality.
 
 ### Architectural Considerations for Phase 4
 - `playerService.updateResource` now records history, providing a hook for OBS broadcasts.

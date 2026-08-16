@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useAppContext } from '../store/AppContext';
+import { useAppContext, View } from '../store/AppContext';
 import { sessionService } from '../services/sessionService';
+import { entityService } from '../services/entityService';
 import PlayerCard from '../components/campaign/PlayerCard';
-import { SessionEvent } from '../types';
+import { SessionEvent, EntityType, CampaignEntity } from '../types';
+import QuickAddModal from '../components/common/QuickAddModal';
 
 const PlayingPage: React.FC = () => {
-  const { activeCampaign, activeSession, setActiveSession, players } = useAppContext();
+  const { activeCampaign, activeSession, setActiveSession, players, setCurrentView, setSelectedEntity } = useAppContext();
   const [events, setEvents] = useState<SessionEvent[]>([]);
   const [newEventText, setNewEventText] = useState('');
   const [isBookOpen, setIsBookOpen] = useState(false);
+  const [bookSubView, setBookSubView] = useState<EntityType | 'Note' | null>(null);
+  const [entities, setEntities] = useState<CampaignEntity[]>([]);
   const [sessionNotes, setSessionNotes] = useState('');
+  const [quickAddType, setQuickAddType] = useState<EntityType | null>(null);
+  const [loadingEntities, setLoadingEntities] = useState(false);
 
   useEffect(() => {
     if (activeSession) {
@@ -17,6 +23,25 @@ const PlayingPage: React.FC = () => {
       setSessionNotes(activeSession.notes || '');
     }
   }, [activeSession]);
+
+  useEffect(() => {
+    if (isBookOpen && bookSubView && activeCampaign) {
+      loadEntities();
+    }
+  }, [isBookOpen, bookSubView, activeCampaign]);
+
+  const loadEntities = async () => {
+    if (!activeCampaign || !bookSubView) return;
+    setLoadingEntities(true);
+    try {
+      const data = await entityService.getAllByCampaign(activeCampaign.id, bookSubView === 'Note' ? 'Note' as EntityType : bookSubView);
+      setEntities(data);
+    } catch (error) {
+      console.error('Failed to load entities:', error);
+    } finally {
+      setLoadingEntities(false);
+    }
+  };
 
   const loadEvents = async () => {
     if (activeSession) {
@@ -107,6 +132,12 @@ const PlayingPage: React.FC = () => {
             📖 Campaign Book
           </button>
           <button 
+            onClick={() => setCurrentView('History')}
+            className="px-4 py-2 bg-gray-700 border border-gray-600 text-gray-300 rounded-lg font-bold text-sm hover:bg-gray-650 transition-all"
+          >
+            📜 History
+          </button>
+          <button 
             onClick={handleEndSession}
             className="px-4 py-2 bg-red-900/20 border border-red-900/50 text-red-400 rounded-lg font-bold text-sm hover:bg-red-900/40 transition-all"
           >
@@ -189,43 +220,119 @@ const PlayingPage: React.FC = () => {
             isBookOpen ? 'w-[400px] opacity-100' : 'w-0 opacity-0'
           }`}
         >
-          <div className="flex-1 overflow-auto p-6">
+          <div className="flex-1 overflow-auto p-6 flex flex-col h-full">
              <div className="flex justify-between items-center mb-6">
-               <h3 className="text-xl font-bold text-white">Campaign Book</h3>
-               <button onClick={() => setIsBookOpen(false)} className="text-gray-500 hover:text-white">&times;</button>
+               <div className="flex items-center space-x-2">
+                 {bookSubView && (
+                   <button 
+                     onClick={() => setBookSubView(null)}
+                     className="text-gray-500 hover:text-white mr-2"
+                   >
+                     ←
+                   </button>
+                 )}
+                 <h3 className="text-xl font-bold text-white">
+                   {bookSubView ? `${bookSubView}s` : 'Campaign Book'}
+                 </h3>
+               </div>
+               <button onClick={() => setIsBookOpen(false)} className="text-gray-500 hover:text-white text-2xl leading-none">&times;</button>
              </div>
              
-             {/* Simple list of entities for now, in a real app we'd reuse CampaignOverview/Sidebar logic */}
-             <div className="space-y-4">
-               <p className="text-sm text-gray-400 italic">Quick Access to your campaign notes and entities.</p>
-               <div className="grid grid-cols-2 gap-2">
-                 {['NPC', 'Location', 'Quest', 'Faction', 'Note'].map(type => (
+             {!bookSubView ? (
+               <div className="space-y-4">
+                 <p className="text-sm text-gray-400 italic">Quick Access to your campaign notes and entities.</p>
+                 <div className="grid grid-cols-2 gap-2">
+                   {[
+                     { type: 'NPC', label: 'NPCs' },
+                     { type: 'Location', label: 'Locations' },
+                     { type: 'Quest', label: 'Quests' },
+                     { type: 'Faction', label: 'Factions' },
+                   ].map(item => (
+                     <button 
+                       key={item.type}
+                       onClick={() => setBookSubView(item.type as EntityType)}
+                       className="bg-gray-800 border border-gray-700 p-3 rounded-lg text-sm text-white hover:bg-gray-700 text-left flex items-center space-x-2"
+                     >
+                       <span>{item.label}</span>
+                     </button>
+                   ))}
                    <button 
-                    key={type}
-                    className="bg-gray-800 border border-gray-700 p-3 rounded-lg text-sm text-white hover:bg-gray-700 text-left flex items-center space-x-2"
+                     onClick={() => setBookSubView('Note')}
+                     className="bg-gray-800 border border-gray-700 p-3 rounded-lg text-sm text-white hover:bg-gray-700 text-left flex items-center space-x-2"
                    >
-                     <span>{type}s</span>
+                     <span>Notes</span>
                    </button>
-                 ))}
+                 </div>
+                 
+                 <div className="pt-4 border-t border-gray-800">
+                    <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Quick Create</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['NPC', 'Location', 'Quest', 'Faction'].map(type => (
+                        <button 
+                          key={type}
+                          onClick={() => setQuickAddType(type as EntityType)}
+                          className="bg-blue-900/20 border border-blue-900/50 text-blue-400 p-2 rounded text-[10px] font-bold hover:bg-blue-900/40"
+                        >
+                          + NEW {type}
+                        </button>
+                      ))}
+                    </div>
+                 </div>
                </div>
-               
-               <div className="pt-4 border-t border-gray-800">
-                  <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Quick Create</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    {['NPC', 'Location', 'Quest', 'Faction'].map(type => (
-                      <button 
-                        key={type}
-                        className="bg-blue-900/20 border border-blue-900/50 text-blue-400 p-2 rounded text-[10px] font-bold hover:bg-blue-900/40"
-                      >
-                        + NEW {type}
-                      </button>
-                    ))}
-                  </div>
+             ) : (
+               <div className="flex-1 flex flex-col min-h-0">
+                 <div className="mb-4 flex justify-between items-center">
+                    <span className="text-xs text-gray-500">{entities.length} {bookSubView}s found</span>
+                    <button 
+                      onClick={() => {
+                        if (bookSubView !== 'Note') setQuickAddType(bookSubView as EntityType);
+                      }}
+                      className="text-[10px] text-blue-400 font-bold hover:text-blue-300"
+                    >
+                      + ADD NEW
+                    </button>
+                 </div>
+
+                 {loadingEntities ? (
+                   <div className="flex-1 flex items-center justify-center">
+                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                   </div>
+                 ) : (
+                   <div className="flex-1 overflow-y-auto space-y-2 pr-2">
+                     {entities.length > 0 ? (
+                       entities.map(entity => (
+                         <div 
+                           key={entity.id}
+                           onClick={() => {
+                             setSelectedEntity(entity);
+                             setCurrentView('EntityDetail');
+                           }}
+                           className="bg-gray-800 border border-gray-700 p-3 rounded-lg hover:bg-gray-750 transition-colors cursor-pointer group"
+                         >
+                           <h4 className="text-white font-medium text-sm group-hover:text-blue-400 transition-colors">{entity.name}</h4>
+                           {entity.description && (
+                             <p className="text-gray-500 text-xs mt-1 line-clamp-2">{entity.description}</p>
+                           )}
+                         </div>
+                       ))
+                     ) : (
+                       <div className="text-center py-10 text-gray-600 italic text-sm">
+                         No {bookSubView}s found.
+                       </div>
+                     )}
+                   </div>
+                 )}
                </div>
-             </div>
+             )}
           </div>
         </div>
       </div>
+
+      <QuickAddModal 
+        type={quickAddType || 'NPC'} 
+        isOpen={!!quickAddType} 
+        onClose={() => setQuickAddType(null)} 
+      />
     </div>
   );
 };

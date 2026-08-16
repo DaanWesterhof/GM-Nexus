@@ -3,7 +3,7 @@ import { Campaign, CampaignEntity, Session, Player } from '../types';
 import { playerService } from '../services/playerService';
 import { sessionService } from '../services/sessionService';
 
-export type View = 'Overview' | 'NPCs' | 'Locations' | 'Quests' | 'Factions' | 'Notes' | 'Inbox' | 'EntityDetail' | 'Playing' | 'Players';
+export type View = 'Overview' | 'NPCs' | 'Locations' | 'Quests' | 'Factions' | 'Notes' | 'Inbox' | 'EntityDetail' | 'Playing' | 'Players' | 'History';
 
 interface AppContextType {
   activeCampaign: Campaign | null;

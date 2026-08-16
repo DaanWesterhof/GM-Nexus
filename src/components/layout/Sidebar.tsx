@@ -17,6 +17,7 @@ const Sidebar: React.FC = () => {
   const navItems: NavItem[] = [
     { view: 'Playing', label: 'Playing', icon: '🎮' },
     { view: 'Overview', label: 'Overview', icon: '🏠' },
+    { view: 'History', label: 'History', icon: '📜' },
     { view: 'NPCs', label: 'NPCs', icon: '👤' },
     { view: 'Locations', label: 'Locations', icon: '📍' },
     { view: 'Quests', label: 'Quests', icon: '📜' },
