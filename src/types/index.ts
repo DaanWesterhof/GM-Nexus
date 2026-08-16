@@ -30,6 +30,12 @@ export interface PlayerResource {
   updatedAt: string;
 }
 
+export interface QuestObjective {
+  id: string;
+  text: string;
+  completed: boolean;
+}
+
 export interface CampaignEntity {
   id: string;
   campaignId: string;
@@ -40,6 +46,25 @@ export interface CampaignEntity {
   notes?: string;
   parentId?: string;
   status?: QuestStatus;
+  objectives?: string; // JSON string in DB, parsed in UI
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InboxEntry {
+  id: string;
+  campaignId: string;
+  text: string;
+  completed: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Note {
+  id: string;
+  campaignId: string;
+  title: string;
+  content: string;
   createdAt: string;
   updatedAt: string;
 }

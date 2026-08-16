@@ -65,6 +65,38 @@ export const initializeDatabase = async () => {
       notes TEXT,
       parentId TEXT,
       status TEXT,
+      objectives TEXT, -- JSON string for quest objectives
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (campaignId) REFERENCES campaigns (id) ON DELETE CASCADE
+    );
+  `);
+
+  // Migration: Add objectives column if it doesn't exist (for existing Phase 1 databases)
+  try {
+    await database.execute('ALTER TABLE campaign_entities ADD COLUMN objectives TEXT');
+  } catch (e) {
+    // Column might already exist, which is fine
+  }
+
+  await database.execute(`
+    CREATE TABLE IF NOT EXISTS inbox_entries (
+      id TEXT PRIMARY KEY,
+      campaignId TEXT NOT NULL,
+      text TEXT NOT NULL,
+      completed BOOLEAN DEFAULT 0,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (campaignId) REFERENCES campaigns (id) ON DELETE CASCADE
+    );
+  `);
+
+  await database.execute(`
+    CREATE TABLE IF NOT EXISTS notes (
+      id TEXT PRIMARY KEY,
+      campaignId TEXT NOT NULL,
+      title TEXT NOT NULL,
+      content TEXT,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
       updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (campaignId) REFERENCES campaigns (id) ON DELETE CASCADE

@@ -97,15 +97,20 @@ State management will be handled in the React frontend using a combination of:
 
 ## 6. MVP Development Phases
 
-1. **Phase 1: Foundation (Current)**
+1. **Phase 1: Foundation (Completed)**
    - Project configuration verification.
    - SQLite integration and initial schema.
    - Domain models and basic repository layer.
    - Application shell and navigation.
-2. **Phase 2: Campaign Management**
-   - Campaign creation and selection.
-   - CRUD for NPCs, Locations, Quests.
-   - Relationship linking.
+2. **Phase 2: Campaign Management (Completed)**
+   - **Campaign selection**: Create, select, edit, and delete campaigns.
+   - **Entity Management**: Full CRUD for NPCs, Locations, Quests, and Factions.
+   - **Relationship System**: Link any entity to another with custom relationship types.
+   - **Structured Book**: Wiki-style entity detail pages with relationship navigation.
+   - **Campaign Dashboard**: Overview of stats and recent activity.
+   - **Utility Tools**: Campaign-wide search (Ctrl+K), Quick Add, and Campaign Inbox.
+   - **Notes**: Persistent campaign-wide notes with dedicated editor.
+   - **Persistence**: All data stored in SQLite via Tauri's SQL plugin.
 3. **Phase 3: Live Play**
    - Player management and resource tracking.
    - Session management and event logging.
@@ -113,6 +118,24 @@ State management will be handled in the React frontend using a combination of:
    - WebSocket server implementation.
    - Basic OBS overlay template.
    - Real-time state synchronization.
+
+## 7. Phase 2 Implementation Details
+
+### Database Changes
+- Added `inbox_entries` table.
+- Added `notes` table.
+- Added `objectives` column to `campaign_entities` (for future Quest objective refinement).
+- Refined `relationships` handling to be fully generic across all entity types.
+
+### Architectural Improvements
+- **AppContext**: Centralized state for active campaign, current view, and selected entity.
+- **Service Layer Expansion**: Dedicated services for entities, relationships, and campaign content (Inbox/Notes).
+- **Reusable Components**: `EntityModal` and `EntityManager` ensure consistent UX across different data types.
+
+### Known Limitations (Phase 2)
+- Images currently use text paths; integration with Tauri's filesystem for binary storage is planned for Phase 3.
+- Quest objectives are currently stored as a JSON string in the DB; UI for granular objective management is pending.
+- Notes are plain text; Markdown rendering to be added.
 
 ## 7. Testing Strategy
 

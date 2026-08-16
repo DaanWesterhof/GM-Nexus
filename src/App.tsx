@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import Layout from "./components/layout/Layout";
-import CampaignSelector from "./pages/CampaignSelector";
 import { initializeDatabase } from "./services/database";
+
+import { AppProvider } from "./store/AppContext";
+import AppContent from "./AppContent";
 
 function App() {
   const [dbInitialized, setDbInitialized] = useState(false);
@@ -41,9 +42,9 @@ function App() {
   }
 
   return (
-    <Layout>
-      <CampaignSelector />
-    </Layout>
+    <AppProvider>
+      <AppContent />
+    </AppProvider>
   );
 }
 
