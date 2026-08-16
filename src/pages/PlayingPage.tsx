@@ -7,7 +7,7 @@ import { SessionEvent, EntityType, CampaignEntity } from '../types';
 import QuickAddModal from '../components/common/QuickAddModal';
 
 const PlayingPage: React.FC = () => {
-  const { activeCampaign, activeSession, setActiveSession, players, setCurrentView, setSelectedEntity } = useAppContext();
+  const { activeCampaign, activeSession, setActiveSession, players, setCurrentView, setSelectedEntity, entitiesRefreshTrigger } = useAppContext();
   const [events, setEvents] = useState<SessionEvent[]>([]);
   const [newEventText, setNewEventText] = useState('');
   const [isBookOpen, setIsBookOpen] = useState(false);
@@ -20,7 +20,6 @@ const PlayingPage: React.FC = () => {
   useEffect(() => {
     if (activeSession) {
       loadEvents();
-      setSessionNotes(activeSession.notes || '');
     }
   }, [activeSession]);
 
@@ -28,7 +27,7 @@ const PlayingPage: React.FC = () => {
     if (isBookOpen && bookSubView && activeCampaign) {
       loadEntities();
     }
-  }, [isBookOpen, bookSubView, activeCampaign]);
+  }, [isBookOpen, bookSubView, activeCampaign, entitiesRefreshTrigger]);
 
   const loadEntities = async () => {
     if (!activeCampaign || !bookSubView) return;

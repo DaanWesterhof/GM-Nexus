@@ -133,6 +133,7 @@ State management will be handled in the React frontend using a combination of:
 ### State-management changes
 - `AppContext` expanded to include `activeSession` and `players` list.
 - Automatic player and session refreshing on campaign load.
+- Added `refreshEntities` and `entitiesRefreshTrigger` to `AppContext` to coordinate global entity synchronization.
 
 ### New Components
 - `PlayerCard`: Interactive card for each player with health buttons and status display.

@@ -6,7 +6,7 @@ import EntityModal from '../components/common/EntityModal';
 import { getRelationshipWording } from '../constants/relationships';
 
 const EntityDetail: React.FC = () => {
-  const { selectedEntity, setSelectedEntity, activeCampaign, setCurrentView } = useAppContext();
+  const { selectedEntity, setSelectedEntity, activeCampaign, setCurrentView, refreshEntities } = useAppContext();
   const [relationships, setRelationships] = useState<Relationship[]>([]);
   const [relatedEntities, setRelatedEntities] = useState<Record<string, CampaignEntity>>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,12 +48,13 @@ const EntityDetail: React.FC = () => {
     );
   }
 
-  const handleSave = async (data: Partial<CampaignEntity>) => {
+  const handleSave = async (data: Partial<CampaignEntity>, relationshipUpdates?: { added: Partial<Relationship>[], deletedIds: string[] }) => {
     try {
-      await entityService.update(selectedEntity.id, data);
+      await entityService.update(selectedEntity.id, data, relationshipUpdates);
       const updated = await entityService.getById(selectedEntity.id);
       if (updated) setSelectedEntity(updated);
-      loadDetails();
+      await loadDetails();
+      refreshEntities();
     } catch (error) {
       console.error('Failed to update entity:', error);
       alert('Failed to save changes');

@@ -15,11 +15,11 @@ const NPCManagement: React.FC<NPCManagementProps> = ({ campaign }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingNpc, setEditingNpc] = useState<CampaignEntity | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState('');
-  const { setSelectedEntity } = useAppContext();
+  const { setSelectedEntity, refreshEntities, entitiesRefreshTrigger, selectedEntity } = useAppContext();
 
   useEffect(() => {
     loadNPCs();
-  }, [campaign.id]);
+  }, [campaign.id, entitiesRefreshTrigger]);
 
   const loadNPCs = async () => {
     try {
@@ -43,13 +43,18 @@ const NPCManagement: React.FC<NPCManagementProps> = ({ campaign }) => {
     setIsModalOpen(true);
   };
 
-  const handleSave = async (data: Partial<CampaignEntity>) => {
+  const handleSave = async (data: Partial<CampaignEntity>, relationshipUpdates?: { added: Partial<Relationship>[], deletedIds: string[] }) => {
     try {
       if (editingNpc) {
-        await entityService.update(editingNpc.id, data);
+        await entityService.update(editingNpc.id, data, relationshipUpdates);
+        if (selectedEntity?.id === editingNpc.id) {
+          const updated = await entityService.getById(editingNpc.id);
+          if (updated) setSelectedEntity(updated);
+        }
       } else {
+        const newId = crypto.randomUUID();
         await entityService.create({
-          id: crypto.randomUUID(),
+          id: newId,
           campaignId: campaign.id,
           type: 'NPC',
           name: data.name || '',
@@ -61,7 +66,7 @@ const NPCManagement: React.FC<NPCManagementProps> = ({ campaign }) => {
           objectives: data.objectives || null
         } as any);
       }
-      loadNPCs();
+      refreshEntities();
     } catch (error) {
       console.error('Failed to save NPC:', error);
       alert('Failed to save NPC');
@@ -72,7 +77,10 @@ const NPCManagement: React.FC<NPCManagementProps> = ({ campaign }) => {
     if (confirm('Are you sure you want to delete this NPC? Relationships involving this NPC will also be removed.')) {
       try {
         await entityService.delete(id);
-        loadNPCs();
+        if (selectedEntity?.id === id) {
+          setSelectedEntity(null);
+        }
+        refreshEntities();
       } catch (error) {
         alert('Failed to delete NPC');
       }

@@ -19,11 +19,11 @@ const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, de
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEntity, setEditingEntity] = useState<CampaignEntity | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState('');
-  const { setSelectedEntity } = useAppContext();
+  const { setSelectedEntity, refreshEntities, entitiesRefreshTrigger, selectedEntity } = useAppContext();
 
   useEffect(() => {
     loadEntities();
-  }, [campaign.id, type]);
+  }, [campaign.id, type, entitiesRefreshTrigger]);
 
   const loadEntities = async () => {
     try {
@@ -47,10 +47,14 @@ const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, de
     setIsModalOpen(true);
   };
 
-  const handleSave = async (data: Partial<CampaignEntity>) => {
+  const handleSave = async (data: Partial<CampaignEntity>, relationshipUpdates?: { added: Partial<Relationship>[], deletedIds: string[] }) => {
     try {
       if (editingEntity) {
-        await entityService.update(editingEntity.id, data);
+        await entityService.update(editingEntity.id, data, relationshipUpdates);
+        if (selectedEntity?.id === editingEntity.id) {
+          const updated = await entityService.getById(editingEntity.id);
+          if (updated) setSelectedEntity(updated);
+        }
       } else {
         await entityService.create({
           id: crypto.randomUUID(),
@@ -65,7 +69,7 @@ const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, de
           objectives: data.objectives || null
         } as any);
       }
-      loadEntities();
+      refreshEntities();
     } catch (error) {
       console.error(`Failed to save ${type}:`, error);
       alert(`Failed to save ${type}`);
@@ -76,7 +80,10 @@ const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, de
     if (confirm(`Are you sure you want to delete this ${type}? Relationships involving this ${type.toLowerCase()} will also be removed.`)) {
       try {
         await entityService.delete(id);
-        loadEntities();
+        if (selectedEntity?.id === id) {
+          setSelectedEntity(null);
+        }
+        refreshEntities();
       } catch (error) {
         alert(`Failed to delete ${type}`);
       }

@@ -42,7 +42,7 @@ export const entityService = {
     );
   },
 
-  async update(id: string, entity: Partial<CampaignEntity>): Promise<void> {
+  async update(id: string, entity: Partial<CampaignEntity>, relationshipUpdates?: { added: Partial<Relationship>[], deletedIds: string[] }): Promise<void> {
     const db = await getDatabase();
     const sets: string[] = [];
     const values: any[] = [];
@@ -54,13 +54,24 @@ export const entityService = {
       }
     });
 
-    sets.push('updatedAt = CURRENT_TIMESTAMP');
-    values.push(id);
+    if (sets.length > 0) {
+      sets.push('updatedAt = CURRENT_TIMESTAMP');
+      values.push(id);
 
-    await db.execute(
-      `UPDATE campaign_entities SET ${sets.join(', ')} WHERE id = ?`,
-      values
-    );
+      await db.execute(
+        `UPDATE campaign_entities SET ${sets.join(', ')} WHERE id = ?`,
+        values
+      );
+    }
+
+    if (relationshipUpdates) {
+      for (const relId of relationshipUpdates.deletedIds) {
+        await relationshipService.delete(relId);
+      }
+      for (const rel of relationshipUpdates.added) {
+        await relationshipService.create(rel as any);
+      }
+    }
   },
 
   async delete(id: string): Promise<void> {

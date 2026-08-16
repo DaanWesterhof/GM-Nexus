@@ -10,7 +10,7 @@ interface QuickAddModalProps {
 }
 
 const QuickAddModal: React.FC<QuickAddModalProps> = ({ isOpen, onClose, type }) => {
-  const { activeCampaign, setSelectedEntity } = useAppContext();
+  const { activeCampaign, setSelectedEntity, refreshEntities } = useAppContext();
   const [name, setName] = useState('');
 
   if (!isOpen || !activeCampaign) return null;
@@ -19,8 +19,9 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ isOpen, onClose, type }) 
     e.preventDefault();
     if (!name.trim()) return;
 
+    const newId = crypto.randomUUID();
     const newEntity = {
-      id: crypto.randomUUID(),
+      id: newId,
       campaignId: activeCampaign.id,
       type,
       name: name.trim(),
@@ -34,11 +35,12 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ isOpen, onClose, type }) 
 
     try {
       await entityService.create(newEntity as any);
-      const created = await entityService.getById(newEntity.id);
+      const created = await entityService.getById(newId);
       if (created) {
         setSelectedEntity(created);
       }
       
+      refreshEntities();
       setName('');
       onClose();
     } catch (error) {

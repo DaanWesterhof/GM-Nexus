@@ -17,6 +17,8 @@ interface AppContextType {
   players: Player[];
   setPlayers: (players: Player[]) => void;
   refreshPlayers: () => Promise<void>;
+  refreshEntities: () => Promise<void>;
+  entitiesRefreshTrigger: number;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -27,6 +29,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [selectedEntity, setSelectedEntity] = useState<CampaignEntity | null>(null);
   const [activeSession, setActiveSession] = useState<Session | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
+  const [entitiesRefreshTrigger, setEntitiesRefreshTrigger] = useState(0);
 
   const refreshPlayers = useCallback(async () => {
     if (activeCampaign) {
@@ -36,6 +39,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setPlayers([]);
     }
   }, [activeCampaign]);
+
+  const refreshEntities = useCallback(async () => {
+    setEntitiesRefreshTrigger(prev => prev + 1);
+  }, []);
 
   const refreshActiveSession = useCallback(async () => {
     if (activeCampaign) {
@@ -49,7 +56,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     refreshPlayers();
     refreshActiveSession();
-  }, [refreshPlayers, refreshActiveSession]);
+  }, [refreshPlayers, refreshActiveSession, entitiesRefreshTrigger]);
 
   const handleSetActiveCampaign = (campaign: Campaign | null) => {
     setActiveCampaign(campaign);
@@ -80,7 +87,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setActiveSession,
       players,
       setPlayers,
-      refreshPlayers
+      refreshPlayers,
+      refreshEntities,
+      entitiesRefreshTrigger
     }}>
       {children}
     </AppContext.Provider>

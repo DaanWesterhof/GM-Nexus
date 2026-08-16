@@ -85,6 +85,11 @@ const PlayerManagement: React.FC = () => {
     }
   };
 
+  const handleEdit = (player: Player) => {
+    setEditingPlayer(player);
+    setIsAddingPlayer(true);
+  };
+
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this player?')) {
       await playerService.delete(id);
@@ -210,7 +215,7 @@ const PlayerManagement: React.FC = () => {
               )}
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-4">
                 <button
-                  onClick={() => setEditingPlayer(player)}
+                  onClick={() => handleEdit(player)}
                   className="p-2 bg-blue-600 rounded-full text-white hover:bg-blue-500"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

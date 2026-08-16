@@ -9,7 +9,7 @@ interface CampaignOverviewProps {
 }
 
 const CampaignOverview: React.FC<CampaignOverviewProps> = ({ campaign }) => {
-  const { setCurrentView, setSelectedEntity } = useAppContext();
+  const { setCurrentView, setSelectedEntity, entitiesRefreshTrigger } = useAppContext();
   const [stats, setStats] = useState({ npcs: 0, locations: 0, quests: 0, factions: 0 });
   const [recentEntities, setRecentEntities] = useState<CampaignEntity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,7 @@ const CampaignOverview: React.FC<CampaignOverviewProps> = ({ campaign }) => {
     };
 
     loadDashboardData();
-  }, [campaign.id]);
+  }, [campaign.id, entitiesRefreshTrigger]);
 
   if (loading) {
     return (
