@@ -3,6 +3,7 @@ import { CampaignEntity, Relationship } from '../types';
 import { entityService, relationshipService } from '../services/entityService';
 import { useAppContext } from '../store/AppContext';
 import EntityModal from '../components/common/EntityModal';
+import { getRelationshipWording } from '../constants/relationships';
 
 const EntityDetail: React.FC = () => {
   const { selectedEntity, setSelectedEntity, activeCampaign, setCurrentView } = useAppContext();
@@ -144,7 +145,7 @@ const EntityDetail: React.FC = () => {
                     >
                       <div className="flex flex-col">
                         <span className="text-[10px] font-black text-blue-500 uppercase tracking-tighter mb-1">
-                          {rel.relationshipType}
+                          {getRelationshipWording(rel.relationshipType, isSource)}
                         </span>
                         <div className="flex items-center space-x-2">
                           <span className="text-white font-bold group-hover:text-blue-400 transition-colors">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CampaignEntity, Relationship } from '../../types';
 import { entityService, relationshipService } from '../../services/entityService';
+import { RELATIONSHIP_TEMPLATES, getRelationshipWording } from '../../constants/relationships';
 
 interface RelationshipEditorProps {
   campaignId: string;
@@ -12,7 +13,7 @@ const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ campaignId, sou
   const [relationships, setRelationships] = useState<Relationship[]>([]);
   const [allEntities, setAllEntities] = useState<CampaignEntity[]>([]);
   const [targetEntityId, setTargetEntityId] = useState('');
-  const [relationshipType, setRelationshipType] = useState('works for');
+  const [relationshipType, setRelationshipType] = useState(RELATIONSHIP_TEMPLATES[0].id);
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
@@ -72,24 +73,15 @@ const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ campaignId, sou
           
           <div className="flex flex-col space-y-1">
             <label className="text-[10px] font-bold text-gray-500 uppercase px-1">Type</label>
-            <input
-              type="text"
-              list="rel-types"
+            <select
               value={relationshipType}
               onChange={(e) => setRelationshipType(e.target.value)}
-              placeholder="e.g. works for"
               className="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
-            />
-            <datalist id="rel-types">
-              <option value="works for" />
-              <option value="knows" />
-              <option value="located at" />
-              <option value="allied with" />
-              <option value="enemy of" />
-              <option value="member of" />
-              <option value="leader of" />
-              <option value="belongs to" />
-            </datalist>
+            >
+              {RELATIONSHIP_TEMPLATES.map(t => (
+                <option key={t.id} value={t.id}>{t.forward}</option>
+              ))}
+            </select>
           </div>
 
           <div className="flex flex-col space-y-1">
@@ -147,7 +139,7 @@ const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ campaignId, sou
                   <div className="flex items-center space-x-3 text-sm">
                     <span className="text-gray-400 font-bold">{sourceEntity.name}</span>
                     <span className="bg-blue-900/30 text-blue-400 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter">
-                      {rel.relationshipType}
+                      {getRelationshipWording(rel.relationshipType, isSource)}
                     </span>
                     <span className="text-white font-bold">{targetEntity?.name || 'Unknown Entity'}</span>
                     {rel.notes && <span className="text-gray-500 text-xs italic">- {rel.notes}</span>}
