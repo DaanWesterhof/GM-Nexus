@@ -24,8 +24,28 @@ const OverlayApp: React.FC = () => {
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (data.type === 'FULL_SYNC' || data.type === 'STATE_UPDATE') {
+        if (data.type === 'FULL_SYNC') {
           setState(data.payload);
+        } else if (data.type === 'STATE_UPDATE') {
+          setState(prev => {
+            if (!prev) return data.payload;
+            
+            // Merge the updated players into the current state
+            const updatedPlayers = [...prev.players];
+            data.payload.players.forEach((updatedPlayer: any) => {
+              const index = updatedPlayers.findIndex(p => p.id === updatedPlayer.id);
+              if (index !== -1) {
+                updatedPlayers[index] = updatedPlayer;
+              } else {
+                updatedPlayers.push(updatedPlayer);
+              }
+            });
+            
+            return {
+              ...prev,
+              players: updatedPlayers
+            };
+          });
         }
       } catch (e) {
         console.error('Failed to parse WebSocket message', e);
@@ -62,7 +82,7 @@ const OverlayApp: React.FC = () => {
 
   return (
     <div className="p-8 flex flex-wrap gap-6 items-start">
-      {state.players.map(player => (
+      {[...state.players].sort((a, b) => a.name.localeCompare(b.name)).map(player => (
         <PlayerOverlayCard key={player.id} player={player} />
       ))}
     </div>
@@ -81,9 +101,9 @@ const PlayerOverlayCard: React.FC<{
     : 0;
 
   return (
-    <div className="flex items-center bg-black/60 border border-white/20 p-3 rounded-lg shadow-2xl backdrop-blur-sm min-w-[280px]">
+    <div className="flex items-center bg-black/60 border border-white/20 p-3 rounded-lg shadow-2xl backdrop-blur-sm w-[320px] h-[88px]">
       {/* Portrait */}
-      <div className="relative w-16 h-16 mr-4">
+      <div className="relative w-16 h-16 mr-4 flex-shrink-0">
         {player.image ? (
           <img 
             src={player.image.startsWith('http') || player.image.startsWith('data:') ? player.image : `http://127.0.0.1:3030/assets/${encodeURIComponent(player.image)}`} 
@@ -121,19 +141,24 @@ const PlayerOverlayCard: React.FC<{
         )}
 
         {/* Status Effects */}
-        {player.statusEffects && player.statusEffects.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
-            {player.statusEffects.map(effect => (
+        <div className="flex gap-1 mt-1 overflow-hidden h-[18px]">
+          {player.statusEffects && player.statusEffects.length > 0 ? (
+            player.statusEffects.slice(0, 3).map(effect => (
               <div 
                 key={effect.id} 
-                className="bg-blue-600/80 text-white text-[10px] px-1.5 py-0.5 rounded border border-blue-400/50 flex items-center"
+                className="bg-blue-600/80 text-white text-[9px] px-1.5 py-0.5 rounded border border-blue-400/50 flex items-center whitespace-nowrap"
               >
                 {effect.icon && <span className="mr-1">{effect.icon}</span>}
                 {effect.name}
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          ) : (
+            <div className="h-[18px]" /> /* Spacer to maintain height */
+          )}
+          {player.statusEffects && player.statusEffects.length > 3 && (
+            <div className="text-white text-[9px] flex items-center">...</div>
+          )}
+        </div>
       </div>
     </div>
   );

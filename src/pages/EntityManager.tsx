@@ -151,9 +151,6 @@ const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, de
             >
               <div className="p-6 flex-1">
                 <div className="flex items-center space-x-4 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-xl text-gray-400 group-hover:bg-blue-900/30 group-hover:text-blue-300 transition-colors">
-                    {icon}
-                  </div>
                   <div>
                     <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors leading-tight">{entity.name}</h3>
                     <div className="flex items-center space-x-2 mt-0.5">

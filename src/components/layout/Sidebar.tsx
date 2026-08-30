@@ -62,7 +62,6 @@ const Sidebar: React.FC = () => {
                 : 'text-gray-400 hover:bg-gray-700 hover:text-white'
             }`}
           >
-            <span className="text-lg">{item.icon}</span>
             <span>{item.label}</span>
           </button>
         ))}
@@ -79,7 +78,6 @@ const Sidebar: React.FC = () => {
                   : 'text-gray-500 hover:bg-gray-700/50 hover:text-gray-300'
               }`}
             >
-              <span className="text-base">{item.icon}</span>
               <span>{item.label}</span>
             </button>
           ))}
@@ -94,7 +92,7 @@ const Sidebar: React.FC = () => {
           }}
           className="w-full flex items-center justify-center space-x-2 py-2 bg-blue-900/20 border border-blue-900/50 text-blue-400 rounded-lg text-xs font-bold hover:bg-blue-900/40 transition-all mb-2"
         >
-          <span>🔗 Copy Overlay URL</span>
+          <span>Copy Overlay URL</span>
         </button>
         <div className="text-xs font-bold text-gray-500 uppercase tracking-widest px-4">
           Quick Add

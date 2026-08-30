@@ -148,7 +148,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
 
         {/* Quick Buttons */}
         <div className="grid grid-cols-6 gap-1 mt-2">
-          {[-10, -3, -1, 1, 3, 10].map(delta => (
+          {[-10, -5, -1, 1, 5, 10].map(delta => (
             <button
               key={delta}
               onClick={() => handleHealthChange(res.id, delta)}

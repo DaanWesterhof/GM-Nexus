@@ -65,11 +65,6 @@ const EntityDetail: React.FC = () => {
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex justify-between items-start">
         <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 rounded-2xl bg-gray-800 border border-gray-700 flex items-center justify-center text-3xl shadow-lg">
-            {selectedEntity.type === 'NPC' ? '👤' : 
-             selectedEntity.type === 'Location' ? '📍' : 
-             selectedEntity.type === 'Quest' ? '📜' : '🛡️'}
-          </div>
           <div>
             <h2 className="text-4xl font-black text-white tracking-tight">{selectedEntity.name}</h2>
             <div className="flex items-center space-x-3 mt-1">

@@ -64,7 +64,6 @@ const CampaignOverview: React.FC<CampaignOverviewProps> = ({ campaign }) => {
                 <p className="text-gray-400 text-sm font-medium">{stat.label}</p>
                 <p className={`text-2xl font-bold mt-1 ${stat.color}`}>{stat.count}</p>
               </div>
-              <span className="text-2xl opacity-80">{stat.icon}</span>
             </div>
           </div>
         ))}

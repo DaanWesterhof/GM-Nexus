@@ -31,7 +31,7 @@ const AppContent: React.FC = () => {
             type="Location" 
             title="Locations" 
             description="Places and landmarks in your campaign." 
-            icon="📍" 
+            icon="" 
           />
         );
       case 'Quests':
@@ -41,7 +41,7 @@ const AppContent: React.FC = () => {
             type="Quest" 
             title="Quests" 
             description="Adventures and objectives for your players." 
-            icon="📜" 
+            icon="" 
           />
         );
       case 'Factions':
@@ -51,7 +51,7 @@ const AppContent: React.FC = () => {
             type="Faction" 
             title="Factions" 
             description="Organizations and groups competing for power." 
-            icon="🛡️" 
+            icon="" 
           />
         );
       case 'EntityDetail':

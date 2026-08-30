@@ -86,11 +86,6 @@ const SearchOverlay: React.FC = () => {
                   className="w-full text-left p-4 rounded-xl hover:bg-blue-600 group flex items-center justify-between transition-all"
                 >
                   <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 rounded-lg bg-gray-700 flex items-center justify-center text-xl group-hover:bg-blue-500 transition-colors">
-                      {entity.type === 'NPC' ? '👤' : 
-                       entity.type === 'Location' ? '📍' : 
-                       entity.type === 'Quest' ? '📜' : '🛡️'}
-                    </div>
                     <div>
                       <p className="text-white font-bold group-hover:text-white">{entity.name}</p>
                       <p className="text-gray-500 text-xs font-black uppercase tracking-widest group-hover:text-blue-200">{entity.type}</p>

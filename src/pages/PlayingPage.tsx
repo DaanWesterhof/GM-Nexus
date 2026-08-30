@@ -128,13 +128,13 @@ const PlayingPage: React.FC = () => {
               isBookOpen ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-650'
             }`}
           >
-            📖 Campaign Book
+            Campaign Book
           </button>
           <button 
             onClick={() => setCurrentView('History')}
             className="px-4 py-2 bg-gray-700 border border-gray-600 text-gray-300 rounded-lg font-bold text-sm hover:bg-gray-650 transition-all"
           >
-            📜 History
+            History
           </button>
           <button 
             onClick={handleEndSession}
