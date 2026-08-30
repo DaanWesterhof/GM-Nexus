@@ -25,8 +25,8 @@ export const entityService = {
   async create(entity: Omit<CampaignEntity, 'createdAt' | 'updatedAt'>): Promise<void> {
     const db = await getDatabase();
     await db.execute(
-      `INSERT INTO campaign_entities (id, campaignId, type, name, description, image, notes, parentId, status, objectives, createdAt, updatedAt) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+      `INSERT INTO campaign_entities (id, campaignId, type, name, description, image, notes, parentId, status, objectives, statusEffects, currentHealth, maxHealth, inScene, createdAt, updatedAt) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
       [
         entity.id,
         entity.campaignId,
@@ -37,7 +37,11 @@ export const entityService = {
         entity.notes ?? null,
         entity.parentId ?? null,
         entity.status ?? null,
-        entity.objectives ?? null
+        entity.objectives ?? null,
+        entity.statusEffects ?? null,
+        entity.currentHealth ?? null,
+        entity.maxHealth ?? null,
+        entity.inScene ? 1 : 0
       ]
     );
   },
@@ -50,7 +54,11 @@ export const entityService = {
     Object.entries(entity).forEach(([key, value]) => {
       if (key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
         sets.push(`${key} = ?`);
-        values.push(value ?? null);
+        if (key === 'inScene') {
+          values.push(value ? 1 : 0);
+        } else {
+          values.push(value ?? null);
+        }
       }
     });
 
@@ -94,6 +102,14 @@ export const entityService = {
       quests: stats.find(s => s.type === 'Quest')?.count || 0,
       factions: stats.find(s => s.type === 'Faction')?.count || 0,
     };
+  },
+
+  async getInScene(campaignId: string): Promise<CampaignEntity[]> {
+    const db = await getDatabase();
+    return await db.select<CampaignEntity[]>(
+      'SELECT * FROM campaign_entities WHERE campaignId = ? AND inScene = 1 ORDER BY updatedAt DESC',
+      [campaignId]
+    );
   },
 
   async search(campaignId: string, query: string): Promise<CampaignEntity[]> {

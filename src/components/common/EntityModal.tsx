@@ -21,6 +21,8 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
   const [description, setDescription] = useState('');
   const [notes, setNotes] = useState('');
   const [status, setStatus] = useState<QuestStatus>('Planned');
+  const [currentHealth, setCurrentHealth] = useState<string>('10');
+  const [maxHealth, setMaxHealth] = useState<string>('10');
   const [parentId, setParentId] = useState<string | undefined>(undefined);
   const [image, setImage] = useState<string | null>(null);
   const [pendingRelationships, setPendingRelationships] = useState<{ added: Partial<Relationship>[], deletedIds: string[] }>({ added: [], deletedIds: [] });
@@ -32,6 +34,8 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
       setDescription(initialData.description || '');
       setNotes(initialData.notes || '');
       setStatus(initialData.status || 'Planned');
+      setCurrentHealth((initialData.currentHealth ?? 10).toString());
+      setMaxHealth((initialData.maxHealth ?? 10).toString());
       setParentId(initialData.parentId);
       setImage(initialData.image || null);
     } else {
@@ -39,6 +43,8 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
       setDescription('');
       setNotes('');
       setStatus('Planned');
+      setCurrentHealth('10');
+      setMaxHealth('10');
       setParentId(undefined);
       setImage(null);
     }
@@ -49,7 +55,16 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
 
   const handleFinalSave = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({ name, description, notes, status, parentId, image: image || undefined }, pendingRelationships);
+    onSave({ 
+      name, 
+      description, 
+      notes, 
+      status, 
+      parentId, 
+      image: image || undefined,
+      currentHealth: type === 'NPC' ? parseInt(currentHealth) || 0 : undefined,
+      maxHealth: type === 'NPC' ? parseInt(maxHealth) || 0 : undefined
+    }, pendingRelationships);
     onClose();
   };
 
@@ -121,6 +136,29 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
                     placeholder={`Name of the ${type.toLowerCase()}`}
                   />
                 </div>
+
+                {type === 'NPC' && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Current Health</label>
+                      <input
+                        type="number"
+                        value={currentHealth}
+                        onChange={(e) => setCurrentHealth(e.target.value)}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Max Health</label>
+                      <input
+                        type="number"
+                        value={maxHealth}
+                        onChange={(e) => setMaxHealth(e.target.value)}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {type === 'Quest' && (
                   <div>

@@ -12,12 +12,17 @@ interface QuickAddModalProps {
 const QuickAddModal: React.FC<QuickAddModalProps> = ({ isOpen, onClose, type }) => {
   const { activeCampaign, setSelectedEntity, refreshEntities } = useAppContext();
   const [name, setName] = useState('');
+  const [health, setHealth] = useState('10');
+  const [maxHealth, setMaxHealth] = useState('10');
 
   if (!isOpen || !activeCampaign) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
+
+    const hp = parseInt(health) || 0;
+    const maxHp = parseInt(maxHealth) || 10;
 
     const newId = crypto.randomUUID();
     const newEntity = {
@@ -30,7 +35,10 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ isOpen, onClose, type }) 
       image: null,
       parentId: null,
       status: null,
-      objectives: null
+      objectives: null,
+      currentHealth: type === 'NPC' ? hp : null,
+      maxHealth: type === 'NPC' ? maxHp : null,
+      inScene: false
     };
 
     try {
@@ -42,6 +50,8 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ isOpen, onClose, type }) 
       
       refreshEntities();
       setName('');
+      setHealth('10');
+      setMaxHealth('10');
       onClose();
     } catch (error) {
       console.error('Failed to quick add entity:', error);
@@ -74,6 +84,31 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ isOpen, onClose, type }) 
               placeholder={`e.g. ${type === 'NPC' ? 'Captain Brom' : type === 'Location' ? 'Greyhaven' : 'The Missing Merchant'}`}
             />
           </div>
+
+          {type === 'NPC' && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-black text-gray-500 mb-1 uppercase tracking-widest">HP</label>
+                <input
+                  type="number"
+                  required
+                  value={health}
+                  onChange={(e) => setHealth(e.target.value)}
+                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-gray-500 mb-1 uppercase tracking-widest">MAX HP</label>
+                <input
+                  type="number"
+                  required
+                  value={maxHealth}
+                  onChange={(e) => setMaxHealth(e.target.value)}
+                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                />
+              </div>
+            </div>
+          )}
 
           <div className="flex justify-end space-x-3 pt-2">
             <button

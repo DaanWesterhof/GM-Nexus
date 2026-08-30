@@ -66,6 +66,7 @@ export const initializeDatabase = async () => {
       parentId TEXT,
       status TEXT,
       objectives TEXT, -- JSON string for quest objectives
+      statusEffects TEXT, -- JSON string for NPC status effects
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
       updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (campaignId) REFERENCES campaigns (id) ON DELETE CASCADE
@@ -78,6 +79,22 @@ export const initializeDatabase = async () => {
   } catch (e) {
     // Column might already exist
   }
+
+  // Migration: Add statusEffects column to campaign_entities
+  try {
+    await database.execute('ALTER TABLE campaign_entities ADD COLUMN statusEffects TEXT');
+  } catch (e) { /* ignore */ }
+
+  // Migration: Add health and scene columns to campaign_entities
+  try {
+    await database.execute('ALTER TABLE campaign_entities ADD COLUMN currentHealth INTEGER');
+  } catch (e) { /* ignore */ }
+  try {
+    await database.execute('ALTER TABLE campaign_entities ADD COLUMN maxHealth INTEGER');
+  } catch (e) { /* ignore */ }
+  try {
+    await database.execute('ALTER TABLE campaign_entities ADD COLUMN inScene BOOLEAN DEFAULT 0');
+  } catch (e) { /* ignore */ }
 
   // Migration: Add columns to sessions table if they don't exist
   try {
@@ -181,4 +198,23 @@ export const initializeDatabase = async () => {
       FOREIGN KEY (sessionId) REFERENCES sessions (id) ON DELETE SET NULL
     );
   `);
+
+  await database.execute(`
+    CREATE TABLE IF NOT EXISTS creatures (
+      id TEXT PRIMARY KEY,
+      campaignId TEXT NOT NULL,
+      name TEXT NOT NULL,
+      currentHealth INTEGER NOT NULL,
+      maxHealth INTEGER NOT NULL,
+      statusEffects TEXT, -- JSON string
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (campaignId) REFERENCES campaigns (id) ON DELETE CASCADE
+    );
+  `);
+
+  // Migration: Add statusEffects to creatures
+  try {
+    await database.execute('ALTER TABLE creatures ADD COLUMN statusEffects TEXT');
+  } catch (e) { /* ignore */ }
 };

@@ -47,6 +47,10 @@ export interface CampaignEntity {
   parentId?: string;
   status?: QuestStatus;
   objectives?: string; // JSON string in DB, parsed in UI
+  currentHealth?: number;
+  maxHealth?: number;
+  statusEffects?: string; // JSON string
+  inScene?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -107,6 +111,17 @@ export interface StatusEffect {
   icon?: string;
   duration?: string;
   createdAt: string;
+}
+
+export interface Creature {
+  id: string;
+  campaignId: string;
+  name: string;
+  currentHealth: number;
+  maxHealth: number;
+  statusEffects?: string; // JSON string
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ResourceHistory {

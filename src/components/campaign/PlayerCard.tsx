@@ -127,14 +127,14 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
               type="number"
               value={res.currentValue}
               onChange={(e) => handleDirectEdit(res.id, e.target.value)}
-              className="w-12 bg-transparent text-right font-bold text-xl text-white focus:outline-none focus:bg-gray-700 rounded"
+              className="w-12 bg-transparent text-right font-bold text-xl text-white focus:outline-none focus:bg-gray-700 rounded transition-colors"
             />
             <span className="text-gray-500 text-sm">/ {res.maxValue}</span>
           </div>
         </div>
         
         {/* Resource Bar */}
-        <div className="h-4 bg-gray-900 rounded-full overflow-hidden border border-gray-700">
+        <div className="h-4 bg-gray-900 rounded-full overflow-hidden border border-gray-700 shadow-inner">
           <div 
             className={`h-full transition-all duration-300 ${
               isHealth 
@@ -152,7 +152,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
             <button
               key={delta}
               onClick={() => handleHealthChange(res.id, delta)}
-              className={`py-2 rounded-lg text-xs font-bold transition-all ${
+              className={`py-2 rounded-lg text-[10px] font-black transition-all ${
                 delta < 0 
                   ? 'bg-red-900/20 text-red-400 hover:bg-red-900/40 border border-red-900/30' 
                   : 'bg-green-900/20 text-green-400 hover:bg-green-900/40 border border-green-900/30'
@@ -180,14 +180,82 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-600 text-6xl">👤</div>
         )}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900 to-transparent p-4">
-          <h3 className="text-2xl font-black text-white truncate">{player.name}</h3>
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900 to-transparent p-4 flex justify-between items-end">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-2xl font-black text-white truncate">{player.name}</h3>
+          </div>
+          <button 
+            onClick={() => setShowStatusModal(true)}
+            className="mb-1 text-[9px] text-blue-400 hover:text-blue-300 font-bold uppercase tracking-tighter bg-blue-900/40 px-2 py-1 rounded border border-blue-800/30 transition-all backdrop-blur-sm shadow-lg active:scale-95"
+          >
+            + ADD STATUS
+          </button>
         </div>
       </div>
 
       <div className="p-4 flex-1 flex flex-col space-y-6">
         {/* Health Section */}
-        {health && renderResource(health, true)}
+        {health && (
+          <div key={health.id} className="space-y-2">
+            <div className="flex justify-between items-end">
+              <span className="text-xs font-bold uppercase tracking-widest text-gray-500">
+                {health.name}
+              </span>
+              <div className="flex items-center space-x-1">
+                <input 
+                  type="number"
+                  value={health.currentValue}
+                  onChange={(e) => handleDirectEdit(health.id, e.target.value)}
+                  className="w-12 bg-transparent text-right font-bold text-xl text-white focus:outline-none focus:bg-gray-700 rounded transition-colors"
+                />
+                <span className="text-gray-500 text-sm">/ {health.maxValue}</span>
+              </div>
+            </div>
+            
+            {/* Resource Bar */}
+            <div className="h-4 bg-gray-900 rounded-full overflow-hidden border border-gray-700 shadow-inner">
+              <div 
+                className={`h-full transition-all duration-300 ${
+                  ((health.currentValue / health.maxValue) < 0.25 ? 'bg-red-500' :
+                   (health.currentValue / health.maxValue) < 0.5 ? 'bg-yellow-500' : 'bg-green-500')
+                }`}
+                style={{ width: `${(health.currentValue / health.maxValue) * 100}%` }}
+              />
+            </div>
+
+            {/* Quick Buttons */}
+            <div className="grid grid-cols-6 gap-1 mt-2">
+              {[-10, -5, -1, 1, 5, 10].map(delta => (
+                <button
+                  key={delta}
+                  onClick={() => handleHealthChange(health.id, delta)}
+                  className={`py-2 rounded-lg text-[10px] font-black transition-all ${
+                    delta < 0 
+                      ? 'bg-red-900/20 text-red-400 hover:bg-red-900/40 border border-red-900/30' 
+                      : 'bg-green-900/20 text-green-400 hover:bg-green-900/40 border border-green-900/30'
+                  }`}
+                >
+                  {delta > 0 ? `+${delta}` : delta}
+                </button>
+              ))}
+            </div>
+
+            {/* Status Effects - Placed below controls to save space */}
+            <div className="flex flex-wrap gap-1 min-h-[1.25rem] mt-3">
+              {statusEffects.map(status => (
+                <span 
+                  key={status.id}
+                  className="bg-purple-900/30 text-purple-300 border border-purple-800/50 px-2 py-0.5 rounded text-[10px] font-medium flex items-center group cursor-pointer hover:bg-purple-900/50 transition-all"
+                  onClick={() => handleRemoveStatus(status.id)}
+                  title="Click to remove"
+                >
+                  {status.name}
+                  <span className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity">×</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Other Resources */}
         {otherResources.length > 0 && (
@@ -195,33 +263,6 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
             {otherResources.map(res => renderResource(res, false))}
           </div>
         )}
-
-        {/* Status Effects */}
-        <div className="flex-1">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Status Effects</span>
-            <button 
-              onClick={() => setShowStatusModal(true)}
-              className="text-[10px] text-blue-400 hover:text-blue-300 font-bold"
-            >+ ADD</button>
-          </div>
-          <div className="flex flex-wrap gap-1">
-            {statusEffects.map(status => (
-              <span 
-                key={status.id}
-                className="bg-purple-900/30 text-purple-300 border border-purple-800/50 px-2 py-0.5 rounded text-[10px] font-medium flex items-center group cursor-pointer"
-                onClick={() => handleRemoveStatus(status.id)}
-                title="Click to remove"
-              >
-                {status.name}
-                <span className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity">×</span>
-              </span>
-            ))}
-            {statusEffects.length === 0 && (
-              <span className="text-[10px] text-gray-600 italic">No active effects</span>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Add Status Modal - Inline for simplicity */}

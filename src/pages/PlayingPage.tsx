@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../store/AppContext';
 import { sessionService } from '../services/sessionService';
 import { entityService } from '../services/entityService';
+import { creatureService } from '../services/creatureService';
 import PlayerCard from '../components/campaign/PlayerCard';
-import { SessionEvent, EntityType, CampaignEntity } from '../types';
+import CreatureCard from '../components/campaign/CreatureCard';
+import { SessionEvent, EntityType, CampaignEntity, Creature } from '../types';
 import QuickAddModal from '../components/common/QuickAddModal';
+import QuickAddCreatureModal from '../components/common/QuickAddCreatureModal';
 
 const PlayingPage: React.FC = () => {
   const { activeCampaign, activeSession, setActiveSession, players, setCurrentView, setSelectedEntity, entitiesRefreshTrigger } = useAppContext();
@@ -13,9 +16,19 @@ const PlayingPage: React.FC = () => {
   const [isBookOpen, setIsBookOpen] = useState(false);
   const [bookSubView, setBookSubView] = useState<EntityType | 'Note' | null>(null);
   const [entities, setEntities] = useState<CampaignEntity[]>([]);
+  const [inSceneNpcs, setInSceneNpcs] = useState<CampaignEntity[]>([]);
+  const [creatures, setCreatures] = useState<Creature[]>([]);
   const [sessionNotes, setSessionNotes] = useState('');
   const [quickAddType, setQuickAddType] = useState<EntityType | null>(null);
+  const [isQuickAddCreatureOpen, setIsQuickAddCreatureOpen] = useState(false);
   const [loadingEntities, setLoadingEntities] = useState(false);
+
+  useEffect(() => {
+    if (activeCampaign) {
+      loadCreatures();
+      loadInSceneNpcs();
+    }
+  }, [activeCampaign]);
 
   useEffect(() => {
     if (activeSession) {
@@ -40,6 +53,48 @@ const PlayingPage: React.FC = () => {
     } finally {
       setLoadingEntities(false);
     }
+  };
+
+  const loadCreatures = async () => {
+    if (!activeCampaign) return;
+    try {
+      const data = await creatureService.getAllByCampaign(activeCampaign.id);
+      setCreatures(data);
+    } catch (error) {
+      console.error('Failed to load creatures:', error);
+    }
+  };
+
+  const loadInSceneNpcs = async () => {
+    if (!activeCampaign) return;
+    try {
+      const data = await entityService.getInScene(activeCampaign.id);
+      setInSceneNpcs(data);
+    } catch (error) {
+      console.error('Failed to load in-scene NPCs:', error);
+    }
+  };
+
+  const handleToggleNpcScene = async (npc: CampaignEntity) => {
+    const newState = !npc.inScene;
+    
+    // If adding to scene for the first time or health is missing, set defaults
+    const updates: Partial<CampaignEntity> = { inScene: newState };
+    if (newState && (npc.currentHealth === undefined || npc.currentHealth === null)) {
+      updates.currentHealth = 10;
+    }
+    if (newState && (npc.maxHealth === undefined || npc.maxHealth === null)) {
+      updates.maxHealth = 10;
+    }
+
+    await entityService.update(npc.id, updates);
+    loadInSceneNpcs();
+    if (isBookOpen) loadEntities();
+  };
+
+  const handleDeleteCreature = async (id: string) => {
+    await creatureService.delete(id);
+    loadCreatures();
   };
 
   const loadEvents = async () => {
@@ -148,13 +203,50 @@ const PlayingPage: React.FC = () => {
       <div className="flex-1 flex overflow-hidden">
         {/* Main Content: Player Cards */}
         <div className={`flex-1 overflow-auto p-8 transition-all duration-500 ${isBookOpen ? 'pr-4' : ''}`}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">Players</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
             {players.map(player => (
               <PlayerCard key={player.id} player={player} activeSessionId={activeSession.id} />
             ))}
             {players.length === 0 && (
-              <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-800 rounded-3xl">
-                <p className="text-gray-600 italic">No players in this campaign yet.</p>
+              <div className="col-span-full py-10 text-center border-2 border-dashed border-gray-800 rounded-3xl">
+                <p className="text-gray-600 italic text-sm">No players in this campaign yet.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">Scene Entities</h3>
+            <button 
+              onClick={() => {
+                setIsQuickAddCreatureOpen(true);
+              }}
+              className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 px-3 py-1 rounded-lg text-[10px] font-black transition-all"
+            >
+              + QUICK ADD CREATURE
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+            {inSceneNpcs.map(npc => (
+              <CreatureCard 
+                key={npc.id} 
+                npc={npc} 
+                onUpdate={loadInSceneNpcs} 
+              />
+            ))}
+            {creatures.map(creature => (
+              <CreatureCard 
+                key={creature.id} 
+                creature={creature} 
+                onUpdate={loadCreatures} 
+                onDelete={() => handleDeleteCreature(creature.id)} 
+              />
+            ))}
+            {inSceneNpcs.length === 0 && creatures.length === 0 && (
+              <div className="col-span-full py-10 text-center border-2 border-dashed border-gray-800 rounded-3xl">
+                <p className="text-gray-600 italic text-sm">The scene is currently empty. Add creatures or select NPCs from the Campaign Book.</p>
               </div>
             )}
           </div>
@@ -302,15 +394,36 @@ const PlayingPage: React.FC = () => {
                        entities.map(entity => (
                          <div 
                            key={entity.id}
-                           onClick={() => {
-                             setSelectedEntity(entity);
-                             setCurrentView('EntityDetail');
-                           }}
-                           className="bg-gray-800 border border-gray-700 p-3 rounded-lg hover:bg-gray-750 transition-colors cursor-pointer group"
+                           className="bg-gray-800 border border-gray-700 p-3 rounded-lg hover:bg-gray-750 transition-colors group relative"
                          >
-                           <h4 className="text-white font-medium text-sm group-hover:text-blue-400 transition-colors">{entity.name}</h4>
-                           {entity.description && (
-                             <p className="text-gray-500 text-xs mt-1 line-clamp-2">{entity.description}</p>
+                           <div 
+                             className="cursor-pointer"
+                             onClick={() => {
+                               setSelectedEntity(entity);
+                               setCurrentView('EntityDetail');
+                             }}
+                           >
+                             <h4 className="text-white font-medium text-sm group-hover:text-blue-400 transition-colors">{entity.name}</h4>
+                             {entity.description && (
+                               <p className="text-gray-500 text-xs mt-1 line-clamp-2">{entity.description}</p>
+                             )}
+                           </div>
+                          
+                           {bookSubView === 'NPC' && (
+                             <button 
+                               onClick={(e) => {
+                                 e.stopPropagation();
+                                 handleToggleNpcScene(entity);
+                               }}
+                               className={`absolute top-2 right-2 w-6 h-6 rounded-md flex items-center justify-center transition-all shadow-lg ${
+                                 entity.inScene 
+                                   ? 'bg-red-600 hover:bg-red-700 text-white opacity-100' 
+                                   : 'bg-blue-600 hover:bg-blue-700 text-white opacity-0 group-hover:opacity-100'
+                               }`}
+                               title={entity.inScene ? "Remove from Scene" : "Add to Scene"}
+                             >
+                               <span className="text-lg leading-none">{entity.inScene ? '×' : '+'}</span>
+                             </button>
                            )}
                          </div>
                        ))
@@ -331,6 +444,14 @@ const PlayingPage: React.FC = () => {
         type={quickAddType || 'NPC'} 
         isOpen={!!quickAddType} 
         onClose={() => setQuickAddType(null)} 
+      />
+
+      <QuickAddCreatureModal 
+        isOpen={isQuickAddCreatureOpen}
+        onClose={() => {
+          setIsQuickAddCreatureOpen(false);
+        }}
+        onAdded={loadCreatures}
       />
     </div>
   );
