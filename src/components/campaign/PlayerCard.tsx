@@ -137,12 +137,15 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
         <div className="h-4 bg-theme-bg rounded-full overflow-hidden border border-theme-border shadow-inner">
           <div 
             className={`h-full transition-all duration-300 ${
-              isHealth 
+              isHealth && !res.color
                 ? ((res.currentValue / res.maxValue) < 0.25 ? 'bg-red-500' :
                    (res.currentValue / res.maxValue) < 0.5 ? 'bg-yellow-500' : 'bg-green-500')
-                : 'bg-theme-primary'
+                : !res.color ? 'bg-theme-primary' : ''
             }`}
-            style={{ width: `${(res.currentValue / res.maxValue) * 100}%` }}
+            style={{ 
+              width: `${(res.currentValue / res.maxValue) * 100}%`,
+              backgroundColor: res.color || undefined
+            }}
           />
         </div>
 
@@ -216,10 +219,15 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
             <div className="h-4 bg-theme-bg rounded-full overflow-hidden border border-theme-border shadow-inner">
               <div 
                 className={`h-full transition-all duration-300 ${
-                  ((health.currentValue / health.maxValue) < 0.25 ? 'bg-red-500' :
-                   (health.currentValue / health.maxValue) < 0.5 ? 'bg-yellow-500' : 'bg-green-500')
+                  !health.color 
+                    ? ((health.currentValue / health.maxValue) < 0.25 ? 'bg-red-500' :
+                       (health.currentValue / health.maxValue) < 0.5 ? 'bg-yellow-500' : 'bg-green-500')
+                    : ''
                 }`}
-                style={{ width: `${(health.currentValue / health.maxValue) * 100}%` }}
+                style={{ 
+                  width: `${(health.currentValue / health.maxValue) * 100}%`,
+                  backgroundColor: health.color || undefined
+                }}
               />
             </div>
 

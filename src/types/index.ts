@@ -26,6 +26,7 @@ export interface PlayerResource {
   currentValue: number;
   maxValue: number;
   displayStyle: string;
+  color?: string;
   createdAt: string;
   updatedAt: string;
 }

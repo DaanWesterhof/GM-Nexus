@@ -49,8 +49,8 @@ export const playerService = {
   async createResource(resource: Omit<PlayerResource, 'createdAt' | 'updatedAt'>): Promise<void> {
     const db = await getDatabase();
     await db.execute(
-      'INSERT INTO player_resources (id, playerId, name, currentValue, maxValue, displayStyle, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
-      [resource.id, resource.playerId, resource.name, resource.currentValue, resource.maxValue, resource.displayStyle]
+      'INSERT INTO player_resources (id, playerId, name, currentValue, maxValue, displayStyle, color, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
+      [resource.id, resource.playerId, resource.name, resource.currentValue, resource.maxValue, resource.displayStyle, resource.color || null]
     );
   },
 

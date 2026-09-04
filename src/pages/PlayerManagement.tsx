@@ -16,9 +16,21 @@ const PlayerManagement: React.FC = () => {
   const [name, setName] = useState('');
   const [image, setImage] = useState('');
   const [status, setStatus] = useState('');
-  const [resources, setResources] = useState<{id?: string, name: string, max: number, style: string}[]>([
-    { name: 'Health', max: 10, style: 'bar' }
+  const [resources, setResources] = useState<{id?: string, name: string, current?: number, max: number, style: string, color?: string}[]>([
+    { name: 'Health', current: 10, max: 10, style: 'bar', color: '#10b981' }
   ]);
+
+  const DEFAULT_COLORS = [
+    { name: 'Health Green', value: '#10b981' },
+    { name: 'Resource Blue', value: '#3b82f6' },
+    { name: 'Red', value: '#ef4444' },
+    { name: 'Orange', value: '#f97316' },
+    { name: 'Pink', value: '#ec4899' },
+    { name: 'Purple', value: '#a855f7' },
+    { name: 'Green', value: '#22c55e' },
+    { name: 'Yellow', value: '#eab308' },
+    { name: 'Blue', value: '#2563eb' },
+  ];
 
   useEffect(() => {
     if (editingPlayer) {
@@ -30,14 +42,14 @@ const PlayerManagement: React.FC = () => {
       setName('');
       setImage('');
       setStatus('');
-      setResources([{ name: 'Health', max: 10, style: 'bar' }]);
+      setResources([{ name: 'Health', current: 10, max: 10, style: 'bar', color: '#10b981' }]);
     }
   }, [editingPlayer]);
 
   const loadPlayerResources = async (playerId: string) => {
     const res = await playerService.getResources(playerId);
     if (res.length > 0) {
-      setResources(res.map(r => ({ id: r.id, name: r.name, max: r.maxValue, style: r.displayStyle })));
+      setResources(res.map(r => ({ id: r.id, name: r.name, current: r.currentValue, max: r.maxValue, style: r.displayStyle, color: r.color })));
     }
   };
 
@@ -95,7 +107,8 @@ const PlayerManagement: React.FC = () => {
           await playerService.updateResourceMetadata(res.id, {
             name: res.name,
             maxValue: res.max,
-            displayStyle: res.style
+            displayStyle: res.style,
+            color: res.color
           });
         } else {
           // Create new
@@ -103,9 +116,10 @@ const PlayerManagement: React.FC = () => {
             id: crypto.randomUUID(),
             playerId,
             name: res.name,
-            currentValue: res.max,
+            currentValue: (res.current !== undefined && !isNaN(res.current)) ? res.current : res.max,
             maxValue: res.max,
-            displayStyle: res.style
+            displayStyle: res.style,
+            color: res.color
           });
         }
       }
@@ -188,43 +202,81 @@ const PlayerManagement: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-theme-text-muted mb-1">Initial Resources</label>
               {resources.map((res, index) => (
-                <div key={index} className="flex space-x-2 mb-2">
-                  <input
-                    type="text"
-                    placeholder="Resource Name"
-                    value={res.name}
-                    onChange={(e) => {
-                      const newRes = [...resources];
-                      newRes[index].name = e.target.value;
-                      setResources(newRes);
-                    }}
-                    className="flex-1 bg-theme-bg border border-theme-border rounded-lg px-3 py-1 text-theme-text text-sm"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    value={res.max}
-                    onChange={(e) => {
-                      const newRes = [...resources];
-                      newRes[index].max = parseInt(e.target.value);
-                      setResources(newRes);
-                    }}
-                    className="w-20 bg-theme-bg border border-theme-border rounded-lg px-3 py-1 text-theme-text text-sm"
-                  />
-                  {resources.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => setResources(resources.filter((_, i) => i !== index))}
-                      className="text-red-500 hover:text-red-400 px-2"
-                    >
-                      &times;
-                    </button>
-                  )}
+                <div key={index} className="flex flex-col space-y-2 mb-4 p-3 bg-theme-bg-alt/50 border border-theme-border rounded-lg">
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      placeholder="Resource Name"
+                      value={res.name}
+                      onChange={(e) => {
+                        const newRes = [...resources];
+                        newRes[index].name = e.target.value;
+                        setResources(newRes);
+                      }}
+                      className="flex-1 bg-theme-bg border border-theme-border rounded-lg px-3 py-1 text-theme-text text-sm"
+                    />
+                    <div className="flex space-x-2 flex-1">
+                      <select
+                        value={res.color || '#10b981'}
+                        onChange={(e) => {
+                          const newRes = [...resources];
+                          newRes[index].color = e.target.value;
+                          setResources(newRes);
+                        }}
+                        className="flex-1 bg-theme-bg border border-theme-border rounded-lg px-3 py-1 text-theme-text text-sm"
+                      >
+                        {DEFAULT_COLORS.map(color => (
+                          <option key={color.value} value={color.value}>{color.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    {resources.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setResources(resources.filter((_, i) => i !== index))}
+                        className="text-red-500 hover:text-red-400 px-2"
+                      >
+                        &times;
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex space-x-4 items-center">
+                    <div className="flex flex-1 items-center space-x-2">
+                      <label className="text-[10px] uppercase text-theme-text-muted font-bold">Start</label>
+                      <input
+                        type="number"
+                        placeholder="Current"
+                        value={res.current}
+                        onChange={(e) => {
+                          const newRes = [...resources];
+                          const val = parseInt(e.target.value);
+                          newRes[index].current = isNaN(val) ? undefined : val;
+                          setResources(newRes);
+                        }}
+                        className="flex-1 bg-theme-bg border border-theme-border rounded-lg px-3 py-1 text-theme-text text-sm"
+                      />
+                    </div>
+                    <div className="flex flex-1 items-center space-x-2">
+                      <label className="text-[10px] uppercase text-theme-text-muted font-bold">Max</label>
+                      <input
+                        type="number"
+                        placeholder="Max"
+                        value={res.max}
+                        onChange={(e) => {
+                          const newRes = [...resources];
+                          const val = parseInt(e.target.value);
+                          newRes[index].max = isNaN(val) ? 0 : val;
+                          setResources(newRes);
+                        }}
+                        className="flex-1 bg-theme-bg border border-theme-border rounded-lg px-3 py-1 text-theme-text text-sm"
+                      />
+                    </div>
+                  </div>
                 </div>
               ))}
               <button
                 type="button"
-                onClick={() => setResources([...resources, { name: '', max: 10, style: 'bar' }])}
+                onClick={() => setResources([...resources, { name: '', current: 10, max: 10, style: 'bar', color: '#3b82f6' }])}
                 className="text-xs text-theme-primary hover:text-theme-primary-hover"
               >
                 + Add Resource

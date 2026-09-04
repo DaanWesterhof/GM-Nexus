@@ -55,6 +55,11 @@ export const initializeDatabase = async () => {
     );
   `);
 
+  // Migration: Add color column to player_resources
+  try {
+    await database.execute('ALTER TABLE player_resources ADD COLUMN color TEXT');
+  } catch (e) { /* ignore */ }
+
   await database.execute(`
     CREATE TABLE IF NOT EXISTS campaign_entities (
       id TEXT PRIMARY KEY,

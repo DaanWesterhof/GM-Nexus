@@ -133,9 +133,14 @@ const PlayerOverlayCard: React.FC<{
           <div className="w-full h-3 bg-gray-900 rounded-full overflow-hidden border border-white/10">
             <div 
               className={`h-full transition-all duration-500 ease-out ${
-                healthPercent > 50 ? 'bg-green-500' : healthPercent > 20 ? 'bg-yellow-500' : 'bg-red-500'
+                !healthResource.color
+                  ? (healthPercent > 50 ? 'bg-green-500' : healthPercent > 20 ? 'bg-yellow-500' : 'bg-red-500')
+                  : ''
               }`}
-              style={{ width: `${healthPercent}%` }}
+              style={{ 
+                width: `${healthPercent}%`,
+                backgroundColor: healthResource.color || undefined
+              }}
             />
           </div>
         )}
