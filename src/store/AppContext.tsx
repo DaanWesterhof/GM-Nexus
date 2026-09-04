@@ -29,6 +29,8 @@ interface AppContextType {
   setIsSettingsOpen: (isOpen: boolean) => void;
   theme: string;
   setTheme: (theme: string) => void;
+  featureToggles: Record<string, boolean>;
+  refreshFeatureToggles: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -43,6 +45,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [theme, setThemeState] = useState<string>('dark');
+  const [featureToggles, setFeatureToggles] = useState<Record<string, boolean>>({});
+
+  const refreshFeatureToggles = useCallback(async () => {
+    if (activeCampaign) {
+      const { getCampaignSetting } = await import('../services/settingsService');
+      const toggles = await getCampaignSetting(activeCampaign.id, SETTINGS_KEYS.CAMPAIGN_FEATURE_TOGGLES);
+      setFeatureToggles(toggles || {});
+    } else {
+      setFeatureToggles({});
+    }
+  }, [activeCampaign]);
 
   const setTheme = useCallback(async (newTheme: string) => {
     setThemeState(newTheme);
@@ -98,7 +111,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     refreshPlayers();
     refreshActiveSession();
-  }, [refreshPlayers, refreshActiveSession, entitiesRefreshTrigger]);
+    refreshFeatureToggles();
+  }, [refreshPlayers, refreshActiveSession, refreshFeatureToggles, entitiesRefreshTrigger]);
 
   useEffect(() => {
     if (activeCampaign) {
@@ -149,7 +163,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       isSettingsOpen,
       setIsSettingsOpen,
       theme,
-      setTheme
+      setTheme,
+      featureToggles,
+      refreshFeatureToggles
     }}>
       {children}
     </AppContext.Provider>

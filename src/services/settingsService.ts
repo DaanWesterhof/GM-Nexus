@@ -26,6 +26,14 @@ export const SETTINGS_KEYS = {
   PLAYING_STATUS_ICON_SET: 'playing_status_icon_set',
 };
 
+export const GAME_SYSTEMS = [
+  'D&D 5e',
+  'Pathfinder 2e',
+  'URealms',
+  'Star Trek Adventures',
+  'Generic/Custom'
+];
+
 export const getSetting = async (key: string, campaignId?: string): Promise<any | null> => {
   const db = await getDatabase();
   let query = 'SELECT value FROM settings WHERE key = ?';
@@ -38,14 +46,18 @@ export const getSetting = async (key: string, campaignId?: string): Promise<any 
     query += ' AND campaignId IS NULL';
   }
 
-  const result = await db.select<{ value: string }[]>(query, params);
+  try {
+    const result = await db.select<{ value: string }[]>(query, params);
 
-  if (result.length > 0) {
-    try {
-      return JSON.parse(result[0].value);
-    } catch (e) {
-      return result[0].value;
+    if (result.length > 0) {
+      try {
+        return JSON.parse(result[0].value);
+      } catch (e) {
+        return result[0].value;
+      }
     }
+  } catch (e) {
+    console.error(`Error getting setting ${key}:`, e);
   }
 
   return null;
@@ -56,26 +68,30 @@ export const setSetting = async (key: string, value: any, campaignId?: string): 
   const stringifiedValue = JSON.stringify(value);
   const now = new Date().toISOString();
 
-  // Check if it already exists to use UPDATE or INSERT
-  const existing = await getSetting(key, campaignId);
+  try {
+    // Check if it already exists to use UPDATE or INSERT
+    const existing = await getSetting(key, campaignId);
 
-  if (existing !== null) {
-    let query = 'UPDATE settings SET value = ?, updatedAt = ? WHERE key = ?';
-    let params = [stringifiedValue, now, key];
-    
-    if (campaignId) {
-      query += ' AND campaignId = ?';
-      params.push(campaignId);
+    if (existing !== null) {
+      let query = 'UPDATE settings SET value = ?, updatedAt = ? WHERE key = ?';
+      let params = [stringifiedValue, now, key];
+      
+      if (campaignId) {
+        query += ' AND campaignId = ?';
+        params.push(campaignId);
+      } else {
+        query += ' AND campaignId IS NULL';
+      }
+      
+      await db.execute(query, params);
     } else {
-      query += ' AND campaignId IS NULL';
+      await db.execute(
+        'INSERT INTO settings (key, value, campaignId, updatedAt) VALUES (?, ?, ?, ?)',
+        [key, stringifiedValue, campaignId || null, now]
+      );
     }
-    
-    await db.execute(query, params);
-  } else {
-    await db.execute(
-      'INSERT INTO settings (key, value, campaignId, updatedAt) VALUES (?, ?, ?, ?)',
-      [key, stringifiedValue, campaignId || null, now]
-    );
+  } catch (e) {
+    console.error(`Error setting setting ${key}:`, e);
   }
 };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../store/AppContext';
-import { SETTINGS_KEYS, getGlobalSetting, setGlobalSetting, getCampaignSetting, setCampaignSetting } from '../../services/settingsService';
+import { SETTINGS_KEYS, getGlobalSetting, setGlobalSetting, getCampaignSetting, setCampaignSetting, GAME_SYSTEMS } from '../../services/settingsService';
 import { exportDatabase, getImportPreview, importCampaigns } from '../../services/database';
 import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
@@ -8,7 +8,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 type Tab = 'general' | 'overlay' | 'campaign' | 'playing';
 
 const SettingsDialog: React.FC = () => {
-  const { isSettingsOpen, setIsSettingsOpen, activeCampaign, theme, setTheme } = useAppContext();
+  const { isSettingsOpen, setIsSettingsOpen, activeCampaign, setActiveCampaign, theme, setTheme, refreshFeatureToggles } = useAppContext();
   const [activeTab, setActiveTab] = useState<Tab>('general');
   const [settings, setSettings] = useState<any>({});
   const [importPreview, setImportPreview] = useState<[string, string][] | null>(null);
@@ -66,6 +66,23 @@ const SettingsDialog: React.FC = () => {
     if (!activeCampaign) return;
     await setCampaignSetting(activeCampaign.id, key, value);
     setSettings((prev: any) => ({ ...prev, [key]: value }));
+
+    // If we're updating the game system, also update the campaign record
+    if (key === SETTINGS_KEYS.CAMPAIGN_GAME_SYSTEM) {
+      const { campaignService } = await import('../../services/campaignService');
+      await campaignService.update(activeCampaign.id, activeCampaign.name, value);
+      
+      // Update local state in context
+      setActiveCampaign({
+        ...activeCampaign,
+        gameSystem: value
+      });
+    }
+
+    // Refresh feature toggles if they were changed
+    if (key === SETTINGS_KEYS.CAMPAIGN_FEATURE_TOGGLES) {
+      refreshFeatureToggles();
+    }
   };
 
   const handleExport = async () => {
@@ -318,14 +335,13 @@ const SettingsDialog: React.FC = () => {
                     <div>
                       <label className="block text-xs text-theme-text-muted mb-1">Game System</label>
                       <select 
-                        value={settings[SETTINGS_KEYS.CAMPAIGN_GAME_SYSTEM] || 'D&D 5e'}
+                        value={settings[SETTINGS_KEYS.CAMPAIGN_GAME_SYSTEM] || activeCampaign.gameSystem}
                         onChange={(e) => updateCampaignSetting(SETTINGS_KEYS.CAMPAIGN_GAME_SYSTEM, e.target.value)}
                         className="w-full bg-theme-bg border border-theme-border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-theme-primary text-theme-text"
                       >
-                        <option>D&D 5e</option>
-                        <option>Pathfinder 2e</option>
-                        <option>Star Trek Adventures</option>
-                        <option>Generic/Custom</option>
+                        {GAME_SYSTEMS.map(system => (
+                          <option key={system} value={system}>{system}</option>
+                        ))}
                       </select>
                     </div>
                   </div>
@@ -334,16 +350,25 @@ const SettingsDialog: React.FC = () => {
                 <section>
                   <h3 className="text-sm font-bold text-theme-text-muted uppercase tracking-wider mb-4">Feature Toggles</h3>
                   <div className="space-y-2">
-                    {['Factions', 'Quests', 'Inbox', 'History'].map(feature => (
-                      <label key={feature} className="flex items-center justify-between cursor-pointer">
-                        <span className="text-theme-text">{feature}</span>
-                        <input 
-                          type="checkbox" 
-                          defaultChecked={true}
-                          className="form-checkbox h-5 w-5 text-theme-primary rounded"
-                        />
-                      </label>
-                    ))}
+                    {['Factions', 'Quests', 'Inbox', 'History'].map(feature => {
+                      const toggles = settings[SETTINGS_KEYS.CAMPAIGN_FEATURE_TOGGLES] || {};
+                      const isEnabled = toggles[feature] !== false; // Default to true if not set
+                      
+                      return (
+                        <label key={feature} className="flex items-center justify-between cursor-pointer">
+                          <span className="text-theme-text">{feature}</span>
+                          <input 
+                            type="checkbox" 
+                            checked={isEnabled}
+                            onChange={(e) => {
+                              const newToggles = { ...toggles, [feature]: e.target.checked };
+                              updateCampaignSetting(SETTINGS_KEYS.CAMPAIGN_FEATURE_TOGGLES, newToggles);
+                            }}
+                            className="form-checkbox h-5 w-5 text-theme-primary rounded cursor-pointer"
+                          />
+                        </label>
+                      );
+                    })}
                   </div>
                 </section>
               </div>

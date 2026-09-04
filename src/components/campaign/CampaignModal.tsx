@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Campaign } from '../../types';
+import { GAME_SYSTEMS } from '../../services/settingsService';
 
 interface CampaignModalProps {
   isOpen: boolean;
@@ -11,7 +12,7 @@ interface CampaignModalProps {
 
 const CampaignModal: React.FC<CampaignModalProps> = ({ isOpen, onClose, onSave, initialData, title }) => {
   const [name, setName] = useState('');
-  const [gameSystem, setGameSystem] = useState('D&D');
+  const [gameSystem, setGameSystem] = useState(GAME_SYSTEMS[0]);
 
   useEffect(() => {
     if (initialData) {
@@ -19,7 +20,7 @@ const CampaignModal: React.FC<CampaignModalProps> = ({ isOpen, onClose, onSave, 
       setGameSystem(initialData.gameSystem);
     } else {
       setName('');
-      setGameSystem('D&D');
+      setGameSystem(GAME_SYSTEMS[0]);
     }
   }, [initialData, isOpen]);
 
@@ -61,10 +62,9 @@ const CampaignModal: React.FC<CampaignModalProps> = ({ isOpen, onClose, onSave, 
                 onChange={(e) => setGameSystem(e.target.value)}
                 className="w-full bg-theme-bg border border-theme-border rounded-lg px-4 py-2 text-theme-text focus:outline-none focus:border-theme-primary transition-colors"
               >
-                <option value="D&D">D&D</option>
-                <option value="URealms">URealms</option>
-                <option value="STA">Star Trek Adventures (STA)</option>
-                <option value="Other">Other</option>
+                {GAME_SYSTEMS.map(system => (
+                  <option key={system} value={system}>{system}</option>
+                ))}
               </select>
             </div>
           </div>

@@ -11,7 +11,7 @@ interface NavItem {
 }
 
 const Sidebar: React.FC = () => {
-  const { currentView, setCurrentView, setActiveCampaign } = useAppContext();
+  const { currentView, setCurrentView, setActiveCampaign, activeCampaign, featureToggles } = useAppContext();
   const [quickAddType, setQuickAddType] = useState<EntityType | null>(null);
 
   const navItems: NavItem[] = [
@@ -24,7 +24,13 @@ const Sidebar: React.FC = () => {
     { view: 'Factions', label: 'Factions', icon: '🛡️' },
     { view: 'Notes', label: 'Notes', icon: '📝' },
     { view: 'Inbox', label: 'Inbox', icon: '📥' },
-  ];
+  ].filter(item => {
+    // If it's a togglable feature, check if it's enabled
+    if (['Factions', 'Quests', 'Inbox', 'History'].includes(item.label)) {
+      return featureToggles[item.label] !== false;
+    }
+    return true;
+  });
 
   const extraItems: NavItem[] = [
     { view: 'Players' as any, label: 'Players', icon: '👥', isPage: true }
