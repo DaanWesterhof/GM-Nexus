@@ -5,11 +5,13 @@ import { useAppContext } from '../store/AppContext';
 import { open } from '@tauri-apps/plugin-dialog';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { saveImageToAppFolder } from '../utils/fileUtils';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 
 const PlayerManagement: React.FC = () => {
   const { activeCampaign, refreshPlayers, players } = useAppContext();
   const [isAddingPlayer, setIsAddingPlayer] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
+  const [playerToDelete, setPlayerToDelete] = useState<string | null>(null);
   
   const [name, setName] = useState('');
   const [image, setImage] = useState('');
@@ -122,9 +124,14 @@ const PlayerManagement: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this player?')) {
-      await playerService.delete(id);
+    setPlayerToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (playerToDelete) {
+      await playerService.delete(playerToDelete);
       await refreshPlayers();
+      setPlayerToDelete(null);
     }
   };
 
@@ -302,6 +309,13 @@ const PlayerManagement: React.FC = () => {
           </div>
         )}
       </div>
+      <ConfirmDialog
+        isOpen={playerToDelete !== null}
+        title="Delete Player"
+        message="Are you sure you want to delete this player? This action cannot be undone."
+        onConfirm={confirmDelete}
+        onCancel={() => setPlayerToDelete(null)}
+      />
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Campaign, CampaignEntity, Relationship } from '../types';
 import { entityService } from '../services/entityService';
 import EntityModal from '../components/common/EntityModal';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 
 import { useAppContext } from '../store/AppContext';
 
@@ -17,6 +18,7 @@ const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, de
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEntity, setEditingEntity] = useState<CampaignEntity | undefined>(undefined);
+  const [entityToDelete, setEntityToDelete] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const { setSelectedEntity, refreshEntities, entitiesRefreshTrigger, selectedEntity } = useAppContext();
 
@@ -76,15 +78,21 @@ const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, de
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm(`Are you sure you want to delete this ${type}? Relationships involving this ${type.toLowerCase()} will also be removed.`)) {
+    setEntityToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (entityToDelete) {
       try {
-        await entityService.delete(id);
-        if (selectedEntity?.id === id) {
+        await entityService.delete(entityToDelete);
+        if (selectedEntity?.id === entityToDelete) {
           setSelectedEntity(null);
         }
         refreshEntities();
       } catch (error) {
         alert(`Failed to delete ${type}`);
+      } finally {
+        setEntityToDelete(null);
       }
     }
   };
@@ -203,6 +211,14 @@ const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, de
         initialData={editingEntity}
         type={type}
         campaignId={campaign.id}
+      />
+
+      <ConfirmDialog
+        isOpen={entityToDelete !== null}
+        title={`Delete ${type}`}
+        message={`Are you sure you want to delete this ${type}? Relationships involving this ${type.toLowerCase()} will also be removed.`}
+        onConfirm={confirmDelete}
+        onCancel={() => setEntityToDelete(null)}
       />
     </div>
   );

@@ -3,12 +3,14 @@ import { campaignService } from '../services/campaignService';
 import { Campaign } from '../types';
 import { useAppContext } from '../store/AppContext';
 import CampaignModal from '../components/campaign/CampaignModal';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 
 const CampaignSelector: React.FC = () => {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | undefined>(undefined);
+  const [campaignToDelete, setCampaignToDelete] = useState<string | null>(null);
   
   const { setActiveCampaign } = useAppContext();
 
@@ -55,12 +57,18 @@ const CampaignSelector: React.FC = () => {
   };
 
   const handleDeleteCampaign = async (id: string) => {
-    if (confirm('Are you sure you want to delete this campaign? This action cannot be undone.')) {
+    setCampaignToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (campaignToDelete) {
       try {
-        await campaignService.delete(id);
+        await campaignService.delete(campaignToDelete);
         loadCampaigns();
       } catch (error) {
         alert('Failed to delete campaign');
+      } finally {
+        setCampaignToDelete(null);
       }
     }
   };
@@ -144,6 +152,14 @@ const CampaignSelector: React.FC = () => {
         onSave={handleSaveCampaign}
         initialData={editingCampaign}
         title={editingCampaign ? 'Edit Campaign' : 'Create New Campaign'}
+      />
+
+      <ConfirmDialog
+        isOpen={campaignToDelete !== null}
+        title="Delete Campaign"
+        message="Are you sure you want to delete this campaign? This action cannot be undone."
+        onConfirm={confirmDelete}
+        onCancel={() => setCampaignToDelete(null)}
       />
     </div>
   );

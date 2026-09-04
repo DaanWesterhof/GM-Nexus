@@ -8,6 +8,7 @@ import CreatureCard from '../components/campaign/CreatureCard';
 import { SessionEvent, EntityType, CampaignEntity, Creature } from '../types';
 import QuickAddModal from '../components/common/QuickAddModal';
 import QuickAddCreatureModal from '../components/common/QuickAddCreatureModal';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 
 const PlayingPage: React.FC = () => {
   const { activeCampaign, activeSession, setActiveSession, players, setCurrentView, setSelectedEntity, entitiesRefreshTrigger } = useAppContext();
@@ -22,6 +23,8 @@ const PlayingPage: React.FC = () => {
   const [quickAddType, setQuickAddType] = useState<EntityType | null>(null);
   const [isQuickAddCreatureOpen, setIsQuickAddCreatureOpen] = useState(false);
   const [loadingEntities, setLoadingEntities] = useState(false);
+  const [creatureToDelete, setCreatureToDelete] = useState<string | null>(null);
+  const [showEndSessionConfirm, setShowEndSessionConfirm] = useState(false);
 
   useEffect(() => {
     if (activeCampaign) {
@@ -93,8 +96,15 @@ const PlayingPage: React.FC = () => {
   };
 
   const handleDeleteCreature = async (id: string) => {
-    await creatureService.delete(id);
-    loadCreatures();
+    setCreatureToDelete(id);
+  };
+
+  const confirmDeleteCreature = async () => {
+    if (creatureToDelete) {
+      await creatureService.delete(creatureToDelete);
+      setCreatureToDelete(null);
+      loadCreatures();
+    }
   };
 
   const loadEvents = async () => {
@@ -123,11 +133,14 @@ const PlayingPage: React.FC = () => {
   };
 
   const handleEndSession = async () => {
+    setShowEndSessionConfirm(true);
+  };
+
+  const confirmEndSession = async () => {
     if (!activeSession) return;
-    if (window.confirm('End this session?')) {
-      await sessionService.endSession(activeSession.id);
-      setActiveSession(null);
-    }
+    await sessionService.endSession(activeSession.id);
+    setActiveSession(null);
+    setShowEndSessionConfirm(false);
   };
 
   const handleAddEvent = async (e: React.FormEvent) => {
@@ -452,6 +465,24 @@ const PlayingPage: React.FC = () => {
           setIsQuickAddCreatureOpen(false);
         }}
         onAdded={loadCreatures}
+      />
+
+      <ConfirmDialog
+        isOpen={creatureToDelete !== null}
+        title="Remove Creature"
+        message="Are you sure you want to remove this creature from the scene?"
+        onConfirm={confirmDeleteCreature}
+        onCancel={() => setCreatureToDelete(null)}
+      />
+
+      <ConfirmDialog
+        isOpen={showEndSessionConfirm}
+        title="End Session"
+        message="Are you sure you want to end this session?"
+        confirmLabel="End Session"
+        onConfirm={confirmEndSession}
+        onCancel={() => setShowEndSessionConfirm(false)}
+        isDestructive={false}
       />
     </div>
   );

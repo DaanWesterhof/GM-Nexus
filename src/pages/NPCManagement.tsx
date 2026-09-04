@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Campaign, CampaignEntity, Relationship } from '../types';
 import { entityService } from '../services/entityService';
 import EntityModal from '../components/common/EntityModal';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 
 import { useAppContext } from '../store/AppContext';
 
@@ -14,6 +15,7 @@ const NPCManagement: React.FC<NPCManagementProps> = ({ campaign }) => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingNpc, setEditingNpc] = useState<CampaignEntity | undefined>(undefined);
+  const [npcToDelete, setNpcToDelete] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const { setSelectedEntity, refreshEntities, entitiesRefreshTrigger, selectedEntity } = useAppContext();
 
@@ -74,15 +76,21 @@ const NPCManagement: React.FC<NPCManagementProps> = ({ campaign }) => {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this NPC? Relationships involving this NPC will also be removed.')) {
+    setNpcToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (npcToDelete) {
       try {
-        await entityService.delete(id);
-        if (selectedEntity?.id === id) {
+        await entityService.delete(npcToDelete);
+        if (selectedEntity?.id === npcToDelete) {
           setSelectedEntity(null);
         }
         refreshEntities();
       } catch (error) {
         alert('Failed to delete NPC');
+      } finally {
+        setNpcToDelete(null);
       }
     }
   };
@@ -193,6 +201,14 @@ const NPCManagement: React.FC<NPCManagementProps> = ({ campaign }) => {
         initialData={editingNpc}
         type="NPC"
         campaignId={campaign.id}
+      />
+
+      <ConfirmDialog
+        isOpen={npcToDelete !== null}
+        title="Delete NPC"
+        message="Are you sure you want to delete this NPC? Relationships involving this NPC will also be removed."
+        onConfirm={confirmDelete}
+        onCancel={() => setNpcToDelete(null)}
       />
     </div>
   );

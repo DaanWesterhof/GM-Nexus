@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CampaignEntity, Relationship } from '../../types';
 import { entityService, relationshipService } from '../../services/entityService';
 import { RELATIONSHIP_TEMPLATES, getRelationshipWording } from '../../constants/relationships';
+import ConfirmDialog from './ConfirmDialog';
 
 interface RelationshipEditorProps {
   campaignId: string;
@@ -18,6 +19,7 @@ const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ campaignId, sou
   const [targetEntityId, setTargetEntityId] = useState('');
   const [relationshipType, setRelationshipType] = useState(RELATIONSHIP_TEMPLATES[0].id);
   const [notes, setNotes] = useState('');
+  const [relationshipToDelete, setRelationshipToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     loadEntities();
@@ -73,21 +75,29 @@ const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ campaignId, sou
   };
 
   const handleDelete = (id: string) => {
-    if (onRelationshipsChanged) {
-      const isActuallyNew = addedRelationships.some(r => r.id === id);
-      if (isActuallyNew) {
-        const newAdded = addedRelationships.filter(r => r.id !== id);
-        setAddedRelationships(newAdded);
-        onRelationshipsChanged(newAdded, deletedRelationshipIds);
+    setRelationshipToDelete(id);
+  };
+
+  const confirmDelete = () => {
+    if (relationshipToDelete) {
+      const id = relationshipToDelete;
+      if (onRelationshipsChanged) {
+        const isActuallyNew = addedRelationships.some(r => r.id === id);
+        if (isActuallyNew) {
+          const newAdded = addedRelationships.filter(r => r.id !== id);
+          setAddedRelationships(newAdded);
+          onRelationshipsChanged(newAdded, deletedRelationshipIds);
+        } else {
+          const newDeleted = [...deletedRelationshipIds, id];
+          setDeletedRelationshipIds(newDeleted);
+          onRelationshipsChanged(addedRelationships, newDeleted);
+        }
       } else {
-        const newDeleted = [...deletedRelationshipIds, id];
-        setDeletedRelationshipIds(newDeleted);
-        onRelationshipsChanged(addedRelationships, newDeleted);
+        relationshipService.delete(id).then(() => {
+          loadRelationships();
+        });
       }
-    } else {
-      relationshipService.delete(id).then(() => {
-        loadRelationships();
-      });
+      setRelationshipToDelete(null);
     }
   };
 
@@ -200,6 +210,13 @@ const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ campaignId, sou
           <p className="text-gray-500 text-xs italic px-1">No relationships defined for this entity.</p>
         )}
       </div>
+      <ConfirmDialog
+        isOpen={relationshipToDelete !== null}
+        title="Delete Relationship"
+        message="Are you sure you want to delete this relationship?"
+        onConfirm={confirmDelete}
+        onCancel={() => setRelationshipToDelete(null)}
+      />
     </div>
   );
 };

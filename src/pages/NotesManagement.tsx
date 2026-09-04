@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Campaign, Note } from '../types';
 import { campaignContentService } from '../services/campaignContentService';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 
 interface NotesManagementProps {
   campaign: Campaign;
@@ -13,6 +14,7 @@ const NotesManagement: React.FC<NotesManagementProps> = ({ campaign }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState('');
   const [editContent, setEditContent] = useState('');
+  const [noteToDelete, setNoteToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     loadNotes();
@@ -66,10 +68,15 @@ const NotesManagement: React.FC<NotesManagementProps> = ({ campaign }) => {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Delete this note?')) {
-      await campaignContentService.deleteNote(id);
+    setNoteToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (noteToDelete) {
+      await campaignContentService.deleteNote(noteToDelete);
       setSelectedNote(null);
-      loadNotes();
+      await loadNotes();
+      setNoteToDelete(null);
     }
   };
 
@@ -171,6 +178,13 @@ const NotesManagement: React.FC<NotesManagementProps> = ({ campaign }) => {
           </div>
         )}
       </div>
+      <ConfirmDialog
+        isOpen={noteToDelete !== null}
+        title="Delete Note"
+        message="Are you sure you want to delete this note?"
+        onConfirm={confirmDelete}
+        onCancel={() => setNoteToDelete(null)}
+      />
     </div>
   );
 };

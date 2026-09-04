@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Campaign, InboxEntry } from '../types';
 import { campaignContentService } from '../services/campaignContentService';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 
 interface InboxManagementProps {
   campaign: Campaign;
@@ -10,6 +11,7 @@ const InboxManagement: React.FC<InboxManagementProps> = ({ campaign }) => {
   const [entries, setEntries] = useState<InboxEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [newEntryText, setNewEntryText] = useState('');
+  const [entryToDelete, setEntryToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     loadEntries();
@@ -48,8 +50,15 @@ const InboxManagement: React.FC<InboxManagementProps> = ({ campaign }) => {
   };
 
   const handleDelete = async (id: string) => {
-    await campaignContentService.deleteInboxEntry(id);
-    loadEntries();
+    setEntryToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (entryToDelete) {
+      await campaignContentService.deleteInboxEntry(entryToDelete);
+      setEntryToDelete(null);
+      loadEntries();
+    }
   };
 
   return (
@@ -127,6 +136,13 @@ const InboxManagement: React.FC<InboxManagementProps> = ({ campaign }) => {
           ))}
         </div>
       )}
+      <ConfirmDialog
+        isOpen={entryToDelete !== null}
+        title="Delete Inbox Entry"
+        message="Are you sure you want to delete this inbox entry?"
+        onConfirm={confirmDelete}
+        onCancel={() => setEntryToDelete(null)}
+      />
     </div>
   );
 };

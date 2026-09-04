@@ -3,6 +3,7 @@ import { Creature, CampaignEntity } from '../../types';
 import { creatureService } from '../../services/creatureService';
 import { entityService } from '../../services/entityService';
 import { convertFileSrc } from '@tauri-apps/api/core';
+import ConfirmDialog from '../common/ConfirmDialog';
 
 interface CreatureCardProps {
   creature?: Creature;
@@ -14,6 +15,7 @@ interface CreatureCardProps {
 const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, onDelete }) => {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [newStatusName, setNewStatusName] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const entity = creature || npc;
   if (!entity) return null;
@@ -92,16 +94,17 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
   };
 
   const handleRemove = async () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmRemove = async () => {
     if (isNpc) {
-      if (window.confirm(`Remove ${entity.name} from scene?`)) {
-        await entityService.update(entity.id, { inScene: false });
-        onUpdate();
-      }
+      await entityService.update(entity.id, { inScene: false });
+      onUpdate();
     } else if (onDelete) {
-      if (window.confirm(`Remove ${entity.name}?`)) {
-        onDelete();
-      }
+      onDelete();
     }
+    setShowDeleteConfirm(false);
   };
 
   return (
@@ -223,6 +226,14 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title={isNpc ? "Remove NPC" : "Remove Creature"}
+        message={isNpc ? `Remove ${entity.name} from scene?` : `Remove ${entity.name}?`}
+        onConfirm={confirmRemove}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </div>
   );
 };
