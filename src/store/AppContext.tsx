@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, ReactNode, useCallback, use
 import { Campaign, CampaignEntity, Session, Player } from '../types';
 import { playerService } from '../services/playerService';
 import { sessionService } from '../services/sessionService';
+import { SETTINGS_KEYS, getGlobalSetting, setGlobalSetting } from '../services/settingsService';
 
 import { obsService } from '../services/obsService';
 import { listen } from '@tauri-apps/api/event';
@@ -26,6 +27,8 @@ interface AppContextType {
   setIsSearchOpen: (isOpen: boolean) => void;
   isSettingsOpen: boolean;
   setIsSettingsOpen: (isOpen: boolean) => void;
+  theme: string;
+  setTheme: (theme: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -39,6 +42,36 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [entitiesRefreshTrigger, setEntitiesRefreshTrigger] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [theme, setThemeState] = useState<string>('dark');
+
+  const setTheme = useCallback(async (newTheme: string) => {
+    setThemeState(newTheme);
+    
+    // Remove all possible theme classes/attributes
+    document.documentElement.classList.remove('dark');
+    document.documentElement.removeAttribute('data-theme');
+    
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else if (newTheme !== 'light') {
+      document.documentElement.setAttribute('data-theme', newTheme);
+    }
+    
+    await setGlobalSetting(SETTINGS_KEYS.APP_APPEARANCE, newTheme);
+  }, []);
+
+  useEffect(() => {
+    const initTheme = async () => {
+      const savedTheme = await getGlobalSetting(SETTINGS_KEYS.APP_APPEARANCE);
+      if (savedTheme) {
+        setTheme(savedTheme);
+      } else {
+        // Default to dark if not set
+        setTheme('dark');
+      }
+    };
+    initTheme();
+  }, [setTheme]);
 
   const refreshPlayers = useCallback(async () => {
     if (activeCampaign) {
@@ -114,7 +147,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       isSearchOpen,
       setIsSearchOpen,
       isSettingsOpen,
-      setIsSettingsOpen
+      setIsSettingsOpen,
+      theme,
+      setTheme
     }}>
       {children}
     </AppContext.Provider>

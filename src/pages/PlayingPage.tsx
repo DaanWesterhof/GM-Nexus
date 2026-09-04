@@ -167,12 +167,12 @@ const PlayingPage: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center h-full space-y-6">
         <div className="text-center">
-          <h2 className="text-3xl font-black text-white mb-2">Ready to Play?</h2>
-          <p className="text-gray-400">Start a session to manage players and log events.</p>
+          <h2 className="text-3xl font-black text-theme-text mb-2">Ready to Play?</h2>
+          <p className="text-theme-text-muted">Start a session to manage players and log events.</p>
         </div>
         <button
           onClick={handleStartSession}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl text-xl font-bold transition-all shadow-lg shadow-blue-900/40"
+          className="bg-theme-primary hover:bg-theme-primary-hover text-theme-primary-text px-8 py-4 rounded-2xl text-xl font-bold transition-all shadow-lg shadow-black/20"
         >
           Start New Session
         </button>
@@ -183,30 +183,30 @@ const PlayingPage: React.FC = () => {
   return (
     <div className="h-full flex flex-col relative overflow-hidden -m-8">
       {/* Playing Header */}
-      <header className="bg-gray-800 border-b border-gray-700 px-8 py-4 flex justify-between items-center shadow-lg z-10">
+      <header className="bg-theme-bg-alt border-b border-theme-border px-8 py-4 flex justify-between items-center shadow-lg z-10">
         <div>
-          <div className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Active Session</div>
-          <h2 className="text-xl font-bold text-white">{activeSession.name}</h2>
+          <div className="text-[10px] font-black text-theme-primary uppercase tracking-widest">Active Session</div>
+          <h2 className="text-xl font-bold text-theme-text">{activeSession.name}</h2>
         </div>
         
         <div className="flex items-center space-x-4">
           <button 
             onClick={() => setIsBookOpen(!isBookOpen)}
             className={`px-4 py-2 rounded-lg font-bold text-sm transition-all border ${
-              isBookOpen ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-650'
+              isBookOpen ? 'bg-theme-primary border-theme-primary text-theme-primary-text' : 'bg-theme-bg border-theme-border text-theme-text-muted hover:bg-theme-bg-alt hover:text-theme-text'
             }`}
           >
             Campaign Book
           </button>
           <button 
             onClick={() => setCurrentView('History')}
-            className="px-4 py-2 bg-gray-700 border border-gray-600 text-gray-300 rounded-lg font-bold text-sm hover:bg-gray-650 transition-all"
+            className="px-4 py-2 bg-theme-bg border border-theme-border text-theme-text-muted rounded-lg font-bold text-sm hover:bg-theme-bg-alt hover:text-theme-text transition-all"
           >
             History
           </button>
           <button 
             onClick={handleEndSession}
-            className="px-4 py-2 bg-red-900/20 border border-red-900/50 text-red-400 rounded-lg font-bold text-sm hover:bg-red-900/40 transition-all"
+            className="px-4 py-2 bg-red-600/10 border border-red-600/30 text-red-500 rounded-lg font-bold text-sm hover:bg-red-600/20 transition-all"
           >
             End Session
           </button>
@@ -217,26 +217,26 @@ const PlayingPage: React.FC = () => {
         {/* Main Content: Player Cards */}
         <div className={`flex-1 overflow-auto p-8 transition-all duration-500 ${isBookOpen ? 'pr-4' : ''}`}>
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">Players</h3>
+            <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest">Players</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
             {players.map(player => (
               <PlayerCard key={player.id} player={player} activeSessionId={activeSession.id} />
             ))}
             {players.length === 0 && (
-              <div className="col-span-full py-10 text-center border-2 border-dashed border-gray-800 rounded-3xl">
-                <p className="text-gray-600 italic text-sm">No players in this campaign yet.</p>
+              <div className="col-span-full py-10 text-center border-2 border-dashed border-theme-border rounded-3xl bg-theme-bg-alt/30">
+                <p className="text-theme-text-muted italic text-sm">No players in this campaign yet.</p>
               </div>
             )}
           </div>
 
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">Scene Entities</h3>
+            <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest">Scene Entities</h3>
             <button 
               onClick={() => {
                 setIsQuickAddCreatureOpen(true);
               }}
-              className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 px-3 py-1 rounded-lg text-[10px] font-black transition-all"
+              className="bg-theme-primary/10 hover:bg-theme-primary/20 text-theme-primary px-3 py-1 rounded-lg text-[10px] font-black transition-all border border-theme-primary/20"
             >
               + QUICK ADD CREATURE
             </button>
@@ -258,8 +258,8 @@ const PlayingPage: React.FC = () => {
               />
             ))}
             {inSceneNpcs.length === 0 && creatures.length === 0 && (
-              <div className="col-span-full py-10 text-center border-2 border-dashed border-gray-800 rounded-3xl">
-                <p className="text-gray-600 italic text-sm">The scene is currently empty. Add creatures or select NPCs from the Campaign Book.</p>
+              <div className="col-span-full py-10 text-center border-2 border-dashed border-theme-border rounded-3xl bg-theme-bg-alt/30">
+                <p className="text-theme-text-muted italic text-sm">The scene is currently empty. Add creatures or select NPCs from the Campaign Book.</p>
               </div>
             )}
           </div>
@@ -267,48 +267,48 @@ const PlayingPage: React.FC = () => {
           {/* Session Footer Area */}
           <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
             {/* Events Log */}
-            <section className="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden flex flex-col h-[400px]">
-              <div className="px-6 py-4 border-b border-gray-700 bg-gray-800/50 flex justify-between items-center">
-                <h3 className="font-bold text-white uppercase tracking-wider text-xs">Session Events</h3>
+            <section className="bg-theme-bg-alt border border-theme-border rounded-2xl overflow-hidden flex flex-col h-[400px] shadow-lg">
+              <div className="px-6 py-4 border-b border-theme-border bg-theme-bg/50 flex justify-between items-center">
+                <h3 className="font-bold text-theme-text uppercase tracking-wider text-xs">Session Events</h3>
               </div>
-              <div className="p-4 border-b border-gray-700">
+              <div className="p-4 border-b border-theme-border">
                 <form onSubmit={handleAddEvent} className="flex space-x-2">
                   <input 
                     type="text"
                     placeholder="What happened?..."
                     value={newEventText}
                     onChange={(e) => setNewEventText(e.target.value)}
-                    className="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                    className="flex-1 bg-theme-bg border border-theme-border rounded-lg px-4 py-2 text-sm text-theme-text focus:outline-none focus:border-theme-primary transition-colors"
                   />
-                  <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold">Add</button>
+                  <button type="submit" className="bg-theme-primary hover:bg-theme-primary-hover text-theme-primary-text px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors">Add</button>
                 </form>
               </div>
               <div className="flex-1 overflow-auto p-4 space-y-4">
                 {events.map(event => (
                   <div key={event.id} className="flex flex-col space-y-1">
-                    <div className="text-[10px] text-gray-500">{new Date(event.timestamp).toLocaleTimeString()}</div>
-                    <div className="bg-gray-750 p-3 rounded-lg border border-gray-700 text-sm text-gray-200">
+                    <div className="text-[10px] text-theme-text-muted">{new Date(event.timestamp).toLocaleTimeString()}</div>
+                    <div className="bg-theme-bg p-3 rounded-lg border border-theme-border text-sm text-theme-text shadow-sm">
                       {event.text}
                     </div>
                   </div>
                 ))}
                 {events.length === 0 && (
-                  <div className="text-center py-10 text-gray-600 italic text-sm">No events recorded yet.</div>
+                  <div className="text-center py-10 text-theme-text-muted italic text-sm">No events recorded yet.</div>
                 )}
               </div>
             </section>
 
             {/* Session Notes */}
-            <section className="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden flex flex-col h-[400px]">
-              <div className="px-6 py-4 border-b border-gray-700 bg-gray-800/50 flex justify-between items-center">
-                <h3 className="font-bold text-white uppercase tracking-wider text-xs">Session Notes</h3>
+            <section className="bg-theme-bg-alt border border-theme-border rounded-2xl overflow-hidden flex flex-col h-[400px] shadow-lg">
+              <div className="px-6 py-4 border-b border-theme-border bg-theme-bg/50 flex justify-between items-center">
+                <h3 className="font-bold text-theme-text uppercase tracking-wider text-xs">Session Notes</h3>
                 <button 
                   onClick={handleUpdateNotes}
-                  className="text-[10px] text-blue-400 hover:text-blue-300 font-bold"
+                  className="text-[10px] text-theme-primary hover:text-theme-primary-hover font-bold transition-colors"
                 >SAVE NOTES</button>
               </div>
               <textarea 
-                className="flex-1 bg-gray-900 p-6 text-gray-300 focus:outline-none resize-none"
+                className="flex-1 bg-theme-bg p-6 text-theme-text focus:outline-none resize-none font-mono text-sm leading-relaxed"
                 placeholder="Private session notes, player thoughts, future hooks..."
                 value={sessionNotes}
                 onChange={(e) => setSessionNotes(e.target.value)}
@@ -320,7 +320,7 @@ const PlayingPage: React.FC = () => {
 
         {/* Campaign Book Sidebar/Drawer */}
         <div 
-          className={`bg-gray-900 border-l border-gray-700 transition-all duration-500 ease-in-out flex flex-col ${
+          className={`bg-theme-bg-alt border-l border-theme-border transition-all duration-500 ease-in-out flex flex-col shadow-2xl ${
             isBookOpen ? 'w-[400px] opacity-100' : 'w-0 opacity-0'
           }`}
         >
@@ -330,21 +330,21 @@ const PlayingPage: React.FC = () => {
                  {bookSubView && (
                    <button 
                      onClick={() => setBookSubView(null)}
-                     className="text-gray-500 hover:text-white mr-2"
+                     className="text-theme-text-muted hover:text-theme-text mr-2 transition-colors"
                    >
                      ←
                    </button>
                  )}
-                 <h3 className="text-xl font-bold text-white">
+                 <h3 className="text-xl font-bold text-theme-text">
                    {bookSubView ? `${bookSubView}s` : 'Campaign Book'}
                  </h3>
                </div>
-               <button onClick={() => setIsBookOpen(false)} className="text-gray-500 hover:text-white text-2xl leading-none">&times;</button>
+               <button onClick={() => setIsBookOpen(false)} className="text-theme-text-muted hover:text-theme-text text-2xl leading-none transition-colors">&times;</button>
              </div>
              
              {!bookSubView ? (
                <div className="space-y-4">
-                 <p className="text-sm text-gray-400 italic">Quick Access to your campaign notes and entities.</p>
+                 <p className="text-sm text-theme-text-muted italic">Quick Access to your campaign notes and entities.</p>
                  <div className="grid grid-cols-2 gap-2">
                    {[
                      { type: 'NPC', label: 'NPCs' },
@@ -355,27 +355,27 @@ const PlayingPage: React.FC = () => {
                      <button 
                        key={item.type}
                        onClick={() => setBookSubView(item.type as EntityType)}
-                       className="bg-gray-800 border border-gray-700 p-3 rounded-lg text-sm text-white hover:bg-gray-700 text-left flex items-center space-x-2"
+                       className="bg-theme-bg border border-theme-border p-3 rounded-lg text-sm text-theme-text hover:bg-theme-bg-alt hover:border-theme-primary transition-all text-left flex items-center space-x-2 shadow-sm"
                      >
                        <span>{item.label}</span>
                      </button>
                    ))}
                    <button 
                      onClick={() => setBookSubView('Note')}
-                     className="bg-gray-800 border border-gray-700 p-3 rounded-lg text-sm text-white hover:bg-gray-700 text-left flex items-center space-x-2"
+                     className="bg-theme-bg border border-theme-border p-3 rounded-lg text-sm text-theme-text hover:bg-theme-bg-alt hover:border-theme-primary transition-all text-left flex items-center space-x-2 shadow-sm"
                    >
                      <span>Notes</span>
                    </button>
                  </div>
                  
-                 <div className="pt-4 border-t border-gray-800">
-                    <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Quick Create</h4>
+                 <div className="pt-4 border-t border-theme-border">
+                    <h4 className="text-xs font-bold text-theme-text-muted uppercase mb-3">Quick Create</h4>
                     <div className="grid grid-cols-2 gap-2">
                       {['NPC', 'Location', 'Quest', 'Faction'].map(type => (
                         <button 
                           key={type}
                           onClick={() => setQuickAddType(type as EntityType)}
-                          className="bg-blue-900/20 border border-blue-900/50 text-blue-400 p-2 rounded text-[10px] font-bold hover:bg-blue-900/40"
+                          className="bg-theme-primary/10 border border-theme-primary/30 text-theme-primary p-2 rounded text-[10px] font-bold hover:bg-theme-primary/20 transition-all"
                         >
                           + NEW {type}
                         </button>
@@ -386,12 +386,12 @@ const PlayingPage: React.FC = () => {
              ) : (
                <div className="flex-1 flex flex-col min-h-0">
                  <div className="mb-4 flex justify-between items-center">
-                    <span className="text-xs text-gray-500">{entities.length} {bookSubView}s found</span>
+                    <span className="text-xs text-theme-text-muted">{entities.length} {bookSubView}s found</span>
                     <button 
                       onClick={() => {
                         if (bookSubView !== 'Note') setQuickAddType(bookSubView as EntityType);
                       }}
-                      className="text-[10px] text-blue-400 font-bold hover:text-blue-300"
+                      className="text-[10px] text-theme-primary font-bold hover:text-theme-primary-hover transition-colors"
                     >
                       + ADD NEW
                     </button>
@@ -399,7 +399,7 @@ const PlayingPage: React.FC = () => {
 
                  {loadingEntities ? (
                    <div className="flex-1 flex items-center justify-center">
-                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-theme-primary"></div>
                    </div>
                  ) : (
                    <div className="flex-1 overflow-y-auto space-y-2 pr-2">
@@ -407,7 +407,7 @@ const PlayingPage: React.FC = () => {
                        entities.map(entity => (
                          <div 
                            key={entity.id}
-                           className="bg-gray-800 border border-gray-700 p-3 rounded-lg hover:bg-gray-750 transition-colors group relative"
+                           className="bg-theme-bg border border-theme-border p-3 rounded-lg hover:bg-theme-bg-alt hover:border-theme-primary transition-all group relative shadow-sm"
                          >
                            <div 
                              className="cursor-pointer"
@@ -416,9 +416,9 @@ const PlayingPage: React.FC = () => {
                                setCurrentView('EntityDetail');
                              }}
                            >
-                             <h4 className="text-white font-medium text-sm group-hover:text-blue-400 transition-colors">{entity.name}</h4>
+                             <h4 className="text-theme-text font-medium text-sm group-hover:text-theme-primary transition-colors">{entity.name}</h4>
                              {entity.description && (
-                               <p className="text-gray-500 text-xs mt-1 line-clamp-2">{entity.description}</p>
+                               <p className="text-theme-text-muted text-xs mt-1 line-clamp-2">{entity.description}</p>
                              )}
                            </div>
                           
@@ -431,7 +431,7 @@ const PlayingPage: React.FC = () => {
                                className={`absolute top-2 right-2 w-6 h-6 rounded-md flex items-center justify-center transition-all shadow-lg ${
                                  entity.inScene 
                                    ? 'bg-red-600 hover:bg-red-700 text-white opacity-100' 
-                                   : 'bg-blue-600 hover:bg-blue-700 text-white opacity-0 group-hover:opacity-100'
+                                   : 'bg-theme-primary hover:bg-theme-primary-hover text-theme-primary-text opacity-0 group-hover:opacity-100'
                                }`}
                                title={entity.inScene ? "Remove from Scene" : "Add to Scene"}
                              >
@@ -441,7 +441,7 @@ const PlayingPage: React.FC = () => {
                          </div>
                        ))
                      ) : (
-                       <div className="text-center py-10 text-gray-600 italic text-sm">
+                       <div className="text-center py-10 text-theme-text-muted italic text-sm">
                          No {bookSubView}s found.
                        </div>
                      )}

@@ -81,13 +81,13 @@ const NotesManagement: React.FC<NotesManagementProps> = ({ campaign }) => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-180px)] bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden animate-in fade-in duration-500">
+    <div className="flex h-[calc(100vh-180px)] bg-theme-bg-alt border border-theme-border rounded-2xl overflow-hidden animate-in fade-in duration-500 shadow-xl">
       {/* Sidebar */}
-      <div className="w-64 border-r border-gray-700 flex flex-col bg-gray-800/50">
-        <div className="p-4 border-b border-gray-700">
+      <div className="w-64 border-r border-theme-border flex flex-col bg-theme-bg/50">
+        <div className="p-4 border-b border-theme-border">
           <button 
             onClick={handleCreate}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-sm transition-all shadow-lg shadow-blue-900/20"
+            className="w-full bg-theme-primary hover:bg-theme-primary-hover text-theme-primary-text font-bold py-2 rounded-lg text-sm transition-all shadow-lg shadow-black/10"
           >
             + NEW NOTE
           </button>
@@ -102,36 +102,36 @@ const NotesManagement: React.FC<NotesManagementProps> = ({ campaign }) => {
               }}
               className={`w-full text-left p-3 rounded-lg text-sm transition-all ${
                 selectedNote?.id === note.id 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-gray-400 hover:bg-gray-700 hover:text-white'
+                  ? 'bg-theme-primary text-theme-primary-text' 
+                  : 'text-theme-text-muted hover:bg-theme-bg hover:text-theme-text'
               }`}
             >
               <div className="font-bold truncate">{note.title || 'Untitled'}</div>
-              <div className={`text-[10px] mt-1 ${selectedNote?.id === note.id ? 'text-blue-200' : 'text-gray-600'}`}>
+              <div className={`text-[10px] mt-1 ${selectedNote?.id === note.id ? 'opacity-70' : 'text-theme-text-muted opacity-60'}`}>
                 {new Date(note.updatedAt).toLocaleDateString()}
               </div>
             </button>
           ))}
           {notes.length === 0 && !loading && (
-            <div className="text-center py-10 text-gray-600 text-xs italic">No notes.</div>
+            <div className="text-center py-10 text-theme-text-muted text-xs italic">No notes.</div>
           )}
         </div>
       </div>
 
       {/* Editor/Viewer */}
-      <div className="flex-1 flex flex-col bg-gray-900/20">
+      <div className="flex-1 flex flex-col bg-theme-bg/10">
         {selectedNote ? (
           <>
-            <div className="p-6 border-b border-gray-700 flex justify-between items-center bg-gray-800/30">
+            <div className="p-6 border-b border-theme-border flex justify-between items-center bg-theme-bg/30">
               {isEditing ? (
                 <input
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
-                  className="bg-transparent text-2xl font-black text-white focus:outline-none border-b border-blue-500 w-full mr-4"
+                  className="bg-transparent text-2xl font-black text-theme-text focus:outline-none border-b border-theme-primary w-full mr-4"
                 />
               ) : (
-                <h3 className="text-2xl font-black text-white">{selectedNote.title}</h3>
+                <h3 className="text-2xl font-black text-theme-text">{selectedNote.title}</h3>
               )}
               <div className="flex space-x-2">
                 {isEditing ? (
@@ -144,14 +144,14 @@ const NotesManagement: React.FC<NotesManagementProps> = ({ campaign }) => {
                 ) : (
                   <button 
                     onClick={() => startEdit(selectedNote)}
-                    className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-1 rounded-lg text-xs font-bold transition-all"
+                    className="bg-theme-bg border border-theme-border hover:bg-theme-bg-alt text-theme-text px-4 py-1 rounded-lg text-xs font-bold transition-all"
                   >
                     EDIT
                   </button>
                 )}
                 <button 
                   onClick={() => handleDelete(selectedNote.id)}
-                  className="bg-gray-700 hover:bg-red-900 text-gray-400 hover:text-white px-4 py-1 rounded-lg text-xs font-bold transition-all"
+                  className="bg-theme-bg border border-theme-border hover:bg-red-600 hover:text-white text-theme-text-muted px-4 py-1 rounded-lg text-xs font-bold transition-all"
                 >
                   DELETE
                 </button>
@@ -162,18 +162,18 @@ const NotesManagement: React.FC<NotesManagementProps> = ({ campaign }) => {
                 <textarea
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
-                  className="w-full h-full bg-transparent text-gray-300 focus:outline-none resize-none font-mono text-sm leading-relaxed"
+                  className="w-full h-full bg-transparent text-theme-text focus:outline-none resize-none font-mono text-sm leading-relaxed"
                   placeholder="Start writing..."
                 />
               ) : (
-                <div className="text-gray-300 whitespace-pre-wrap leading-relaxed">
-                  {selectedNote.content || <span className="italic text-gray-600 text-sm">Empty note.</span>}
+                <div className="text-theme-text whitespace-pre-wrap leading-relaxed">
+                  {selectedNote.content || <span className="italic text-theme-text-muted text-sm">Empty note.</span>}
                 </div>
               )}
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-600 italic">
+          <div className="flex-1 flex items-center justify-center text-theme-text-muted italic">
             Select or create a note.
           </div>
         )}

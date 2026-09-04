@@ -104,27 +104,27 @@ const NPCManagement: React.FC<NPCManagementProps> = ({ campaign }) => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold text-white">NPCs</h2>
-          <p className="text-gray-400 mt-1">Manage the characters in your world.</p>
+          <h2 className="text-3xl font-bold text-theme-text">NPCs</h2>
+          <p className="text-theme-text-muted mt-1">Manage the characters in your world.</p>
         </div>
         <button 
           onClick={handleCreate}
-          className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg text-sm font-bold text-white transition-all shadow-lg shadow-blue-900/20"
+          className="bg-theme-primary hover:bg-theme-primary-hover px-6 py-2 rounded-lg text-sm font-bold text-theme-primary-text transition-all shadow-lg shadow-black/10"
         >
           + Add NPC
         </button>
       </div>
 
-      <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
+      <div className="bg-theme-bg-alt border border-theme-border rounded-xl p-4">
         <div className="relative">
           <input 
             type="text" 
             placeholder="Search NPCs..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-gray-900 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
+            className="w-full bg-theme-bg border border-theme-border rounded-lg pl-10 pr-4 py-2 text-theme-text focus:outline-none focus:border-theme-primary transition-colors"
           />
-          <svg className="w-5 h-5 absolute left-3 top-2.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 absolute left-3 top-2.5 text-theme-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
@@ -132,15 +132,15 @@ const NPCManagement: React.FC<NPCManagementProps> = ({ campaign }) => {
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-theme-primary"></div>
         </div>
       ) : filteredNPCs.length === 0 ? (
-        <div className="text-center py-20 bg-gray-800/50 rounded-xl border-2 border-gray-700 border-dashed">
-          <p className="text-gray-400 text-lg mb-6">{searchQuery ? 'No NPCs match your search.' : 'No NPCs found.'}</p>
+        <div className="text-center py-20 bg-theme-bg-alt rounded-xl border-2 border-theme-border border-dashed">
+          <p className="text-theme-text-muted text-lg mb-6">{searchQuery ? 'No NPCs match your search.' : 'No NPCs found.'}</p>
           {!searchQuery && (
             <button 
               onClick={handleCreate}
-              className="bg-gray-700 hover:bg-gray-600 px-6 py-2 rounded-lg text-sm font-semibold transition-all"
+              className="bg-theme-primary/10 text-theme-text hover:bg-theme-primary/20 px-6 py-2 rounded-lg text-sm font-semibold transition-all"
             >
               Create your first NPC
             </button>
@@ -152,30 +152,30 @@ const NPCManagement: React.FC<NPCManagementProps> = ({ campaign }) => {
             <div 
               key={npc.id} 
               onClick={() => setSelectedEntity(npc)}
-              className="group bg-gray-800 border border-gray-700 rounded-xl overflow-hidden hover:border-blue-500/50 transition-all shadow-lg flex flex-col cursor-pointer"
+              className="group bg-theme-bg-alt border border-theme-border rounded-xl overflow-hidden hover:border-theme-primary transition-all shadow-lg flex flex-col cursor-pointer"
             >
               <div className="p-6 flex-1">
                 <div className="flex items-center space-x-4 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-xl text-gray-400 group-hover:bg-blue-900/30 group-hover:text-blue-300 transition-colors">
+                  <div className="w-12 h-12 rounded-full bg-theme-bg flex items-center justify-center text-xl text-theme-text-muted group-hover:bg-theme-primary group-hover:text-theme-primary-text transition-colors">
                     👤
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors leading-tight">{npc.name}</h3>
-                    <p className="text-blue-500 text-xs font-bold uppercase tracking-widest mt-0.5">NPC</p>
+                    <h3 className="text-xl font-bold text-theme-text group-hover:text-theme-primary transition-colors leading-tight">{npc.name}</h3>
+                    <p className="text-theme-primary text-xs font-bold uppercase tracking-widest mt-0.5">NPC</p>
                   </div>
                 </div>
                 {npc.description && (
-                  <p className="text-gray-400 text-sm line-clamp-3 mb-4">{npc.description}</p>
+                  <p className="text-theme-text-muted text-sm line-clamp-3 mb-4">{npc.description}</p>
                 )}
               </div>
               
-              <div className="px-6 py-4 bg-gray-800/50 border-t border-gray-700 flex justify-end space-x-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="px-6 py-4 bg-theme-bg border-t border-theme-border flex justify-end space-x-4 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button 
                   onClick={(e) => {
                     e.stopPropagation();
                     handleEdit(npc);
                   }}
-                  className="text-xs font-bold text-gray-400 hover:text-white transition-colors"
+                  className="text-xs font-bold text-theme-text-muted hover:text-theme-text transition-colors"
                 >
                   EDIT
                 </button>
@@ -184,7 +184,7 @@ const NPCManagement: React.FC<NPCManagementProps> = ({ campaign }) => {
                     e.stopPropagation();
                     handleDelete(npc.id);
                   }}
-                  className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors"
+                  className="text-xs font-bold text-red-500 hover:text-red-400 transition-colors"
                 >
                   DELETE
                 </button>

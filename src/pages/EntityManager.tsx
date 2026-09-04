@@ -106,27 +106,27 @@ const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, de
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold text-white">{title}</h2>
-          <p className="text-gray-400 mt-1">{description}</p>
+          <h2 className="text-3xl font-bold text-theme-text">{title}</h2>
+          <p className="text-theme-text-muted mt-1">{description}</p>
         </div>
         <button 
           onClick={handleCreate}
-          className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg text-sm font-bold text-white transition-all shadow-lg shadow-blue-900/20"
+          className="bg-theme-primary hover:bg-theme-primary-hover px-6 py-2 rounded-lg text-sm font-bold text-theme-primary-text transition-all shadow-lg shadow-black/10"
         >
           + Add {type}
         </button>
       </div>
 
-      <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
+      <div className="bg-theme-bg-alt border border-theme-border rounded-xl p-4">
         <div className="relative">
           <input 
             type="text" 
             placeholder={`Search ${type}s...`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-gray-900 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
+            className="w-full bg-theme-bg border border-theme-border rounded-lg pl-10 pr-4 py-2 text-theme-text focus:outline-none focus:border-theme-primary transition-colors"
           />
-          <svg className="w-5 h-5 absolute left-3 top-2.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 absolute left-3 top-2.5 text-theme-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
@@ -134,15 +134,15 @@ const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, de
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-theme-primary"></div>
         </div>
       ) : filteredEntities.length === 0 ? (
-        <div className="text-center py-20 bg-gray-800/50 rounded-xl border-2 border-gray-700 border-dashed">
-          <p className="text-gray-400 text-lg mb-6">{searchQuery ? `No ${type}s match your search.` : `No ${type}s found.`}</p>
+        <div className="text-center py-20 bg-theme-bg-alt rounded-xl border-2 border-theme-border border-dashed">
+          <p className="text-theme-text-muted text-lg mb-6">{searchQuery ? `No ${type}s match your search.` : `No ${type}s found.`}</p>
           {!searchQuery && (
             <button 
               onClick={handleCreate}
-              className="bg-gray-700 hover:bg-gray-600 px-6 py-2 rounded-lg text-sm font-semibold transition-all"
+              className="bg-theme-bg-alt hover:bg-theme-bg px-6 py-2 rounded-lg text-sm font-semibold transition-all border border-theme-border text-theme-text"
             >
               Create your first {type.toLowerCase()}
             </button>
@@ -154,19 +154,19 @@ const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, de
             <div 
               key={entity.id} 
               onClick={() => setSelectedEntity(entity)}
-              className="group bg-gray-800 border border-gray-700 rounded-xl overflow-hidden hover:border-blue-500/50 transition-all shadow-lg flex flex-col cursor-pointer"
+              className="group bg-theme-bg-alt border border-theme-border rounded-xl overflow-hidden hover:border-theme-primary transition-all shadow-lg flex flex-col cursor-pointer"
             >
               <div className="p-6 flex-1">
                 <div className="flex items-center space-x-4 mb-4">
                   <div>
-                    <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors leading-tight">{entity.name}</h3>
+                    <h3 className="text-xl font-bold text-theme-text group-hover:text-theme-primary transition-colors leading-tight">{entity.name}</h3>
                     <div className="flex items-center space-x-2 mt-0.5">
-                      <p className="text-blue-500 text-[10px] font-black uppercase tracking-widest">{type}</p>
+                      <p className="text-theme-primary text-[10px] font-black uppercase tracking-widest">{type}</p>
                       {type === 'Quest' && entity.status && (
                         <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
-                          entity.status === 'Active' ? 'bg-green-900 text-green-400' :
-                          entity.status === 'Completed' ? 'bg-blue-900 text-blue-400' :
-                          'bg-gray-700 text-gray-400'
+                          entity.status === 'Active' ? 'bg-green-600/20 text-green-500' :
+                          entity.status === 'Completed' ? 'bg-blue-600/20 text-blue-500' :
+                          'bg-theme-bg text-theme-text-muted border border-theme-border'
                         }`}>
                           {entity.status}
                         </span>
@@ -175,17 +175,17 @@ const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, de
                   </div>
                 </div>
                 {entity.description && (
-                  <p className="text-gray-400 text-sm line-clamp-3 mb-4">{entity.description}</p>
+                  <p className="text-theme-text-muted text-sm line-clamp-3 mb-4">{entity.description}</p>
                 )}
               </div>
               
-              <div className="px-6 py-4 bg-gray-800/50 border-t border-gray-700 flex justify-end space-x-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="px-6 py-4 bg-theme-bg border-t border-theme-border flex justify-end space-x-4 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button 
                   onClick={(e) => {
                     e.stopPropagation();
                     handleEdit(entity);
                   }}
-                  className="text-xs font-bold text-gray-400 hover:text-white transition-colors"
+                  className="text-xs font-bold text-theme-text-muted hover:text-theme-text transition-colors"
                 >
                   EDIT
                 </button>
@@ -194,7 +194,7 @@ const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, de
                     e.stopPropagation();
                     handleDelete(entity.id);
                   }}
-                  className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors"
+                  className="text-xs font-bold text-red-500 hover:text-red-400 transition-colors"
                 >
                   DELETE
                 </button>

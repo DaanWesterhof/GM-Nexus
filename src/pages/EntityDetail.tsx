@@ -46,7 +46,7 @@ const EntityDetail: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-theme-primary"></div>
       </div>
     );
   }
@@ -99,9 +99,9 @@ const EntityDetail: React.FC = () => {
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Add Status Modal - Reusing the same pattern for consistency */}
       {isStatusModalOpen && (
-        <div className="fixed inset-0 bg-gray-900/90 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-800 border border-gray-700 p-6 rounded-2xl w-full max-w-md shadow-2xl">
-            <h4 className="text-xl font-black text-white mb-4 uppercase tracking-tight">Add Status Effect</h4>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+          <div className="bg-theme-bg border border-theme-border p-6 rounded-2xl w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
+            <h4 className="text-xl font-black text-theme-text mb-4 uppercase tracking-tight">Add Status Effect</h4>
             <input 
               type="text"
               autoFocus
@@ -109,16 +109,16 @@ const EntityDetail: React.FC = () => {
               value={newStatusName}
               onChange={(e) => setNewStatusName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddStatus()}
-              className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white mb-6 focus:outline-none focus:border-blue-500 transition-all shadow-inner"
+              className="w-full bg-theme-bg-alt border border-theme-border rounded-xl px-4 py-3 text-theme-text mb-6 focus:outline-none focus:border-theme-primary transition-all shadow-inner"
             />
             <div className="flex justify-end space-x-3">
               <button 
                 onClick={() => setIsStatusModalOpen(false)}
-                className="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white transition-colors"
+                className="px-4 py-2 text-sm font-bold text-theme-text-muted hover:text-theme-text transition-colors"
               >CANCEL</button>
               <button 
                 onClick={handleAddStatus}
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-black transition-all shadow-lg active:scale-95"
+                className="px-6 py-2 bg-theme-primary hover:bg-theme-primary-hover text-theme-primary-text rounded-xl text-sm font-black transition-all shadow-lg active:scale-95"
               >ADD STATUS</button>
             </div>
           </div>
@@ -128,7 +128,7 @@ const EntityDetail: React.FC = () => {
       <div className="flex justify-between items-start">
         <div className="flex items-center space-x-6">
           {selectedEntity.image && (
-            <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-gray-700 shadow-2xl">
+            <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-theme-border shadow-2xl">
               <img 
                 src={selectedEntity.image.startsWith('http') ? selectedEntity.image : convertFileSrc(selectedEntity.image)} 
                 alt={selectedEntity.name} 
@@ -137,20 +137,20 @@ const EntityDetail: React.FC = () => {
             </div>
           )}
           <div>
-            <h2 className="text-4xl font-black text-white tracking-tight">{selectedEntity.name}</h2>
+            <h2 className="text-4xl font-black text-theme-text tracking-tight">{selectedEntity.name}</h2>
             <div className="flex items-center space-x-3 mt-1">
-              <span className="text-blue-500 font-black uppercase tracking-widest text-sm">{selectedEntity.type}</span>
+              <span className="text-theme-primary font-black uppercase tracking-widest text-sm">{selectedEntity.type}</span>
               <button 
                 onClick={() => setIsStatusModalOpen(true)}
-                className="text-[10px] text-blue-400 hover:text-blue-300 font-bold uppercase tracking-tighter bg-blue-900/40 px-2 py-0.5 rounded border border-blue-800/30 transition-all active:scale-95"
+                className="text-[10px] text-theme-primary hover:text-theme-primary-hover font-bold uppercase tracking-tighter bg-theme-primary/10 px-2 py-0.5 rounded border border-theme-primary/20 transition-all active:scale-95"
               >
                 + ADD STATUS
               </button>
               {selectedEntity.status && (
                 <span className={`text-xs px-2 py-0.5 rounded-full font-bold uppercase ${
-                  selectedEntity.status === 'Active' ? 'bg-green-900 text-green-400' :
-                  selectedEntity.status === 'Completed' ? 'bg-blue-900 text-blue-400' :
-                  'bg-gray-700 text-gray-400'
+                  selectedEntity.status === 'Active' ? 'bg-green-600/20 text-green-500' :
+                  selectedEntity.status === 'Completed' ? 'bg-blue-600/20 text-blue-500' :
+                  'bg-theme-bg-alt text-theme-text-muted border border-theme-border'
                 }`}>
                   {selectedEntity.status}
                 </span>
@@ -161,13 +161,13 @@ const EntityDetail: React.FC = () => {
         <div className="flex space-x-3">
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="bg-gray-800 hover:bg-gray-700 border border-gray-700 px-4 py-2 rounded-lg text-sm font-bold transition-all"
+            className="bg-theme-bg-alt hover:bg-theme-bg border border-theme-border px-4 py-2 rounded-lg text-sm font-bold text-theme-text transition-all shadow-sm"
           >
             EDIT
           </button>
           <button 
             onClick={() => setCurrentView(selectedEntity.type + 's' as any)}
-            className="bg-gray-800 hover:bg-gray-700 border border-gray-700 px-4 py-2 rounded-lg text-sm font-bold transition-all text-gray-400"
+            className="bg-theme-bg-alt hover:bg-theme-bg border border-theme-border px-4 py-2 rounded-lg text-sm font-bold text-theme-text-muted hover:text-theme-text transition-all shadow-sm"
           >
             CLOSE
           </button>
@@ -177,16 +177,16 @@ const EntityDetail: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           {selectedEntity.type === 'NPC' && selectedEntity.maxHealth !== undefined && (
-            <section className="bg-gray-800/50 border border-gray-700 rounded-2xl p-6 relative">
+            <section className="bg-theme-bg-alt border border-theme-border rounded-2xl p-6 relative shadow-lg">
               <div className="flex justify-between items-end mb-4">
-                <span className="text-sm font-black text-gray-500 uppercase tracking-widest">Health</span>
+                <span className="text-sm font-black text-theme-text-muted uppercase tracking-widest">Health</span>
                 <div className="flex items-center space-x-2">
-                  <span className="text-3xl font-black text-white">{selectedEntity.currentHealth}</span>
-                  <span className="text-gray-500 font-bold">/ {selectedEntity.maxHealth}</span>
+                  <span className="text-3xl font-black text-theme-text">{selectedEntity.currentHealth}</span>
+                  <span className="text-theme-text-muted font-bold">/ {selectedEntity.maxHealth}</span>
                 </div>
               </div>
 
-              <div className="h-4 bg-gray-900 rounded-full overflow-hidden border border-gray-700 mb-6">
+              <div className="h-4 bg-theme-bg rounded-full overflow-hidden border border-theme-border mb-6">
                 <div 
                   className={`h-full transition-all duration-500 ${
                     ((selectedEntity.currentHealth || 0) / (selectedEntity.maxHealth || 1)) < 0.25 ? 'bg-red-500' :
@@ -203,8 +203,8 @@ const EntityDetail: React.FC = () => {
                     onClick={() => handleHealthChange(delta)}
                     className={`py-3 rounded-xl text-sm font-black transition-all ${
                       delta < 0 
-                        ? 'bg-red-900/20 text-red-400 hover:bg-red-900/40 border border-red-900/30' 
-                        : 'bg-green-900/20 text-green-400 hover:bg-green-900/40 border border-green-900/30'
+                        ? 'bg-red-600/10 text-red-500 hover:bg-red-600/20 border border-red-600/30' 
+                        : 'bg-green-600/10 text-green-500 hover:bg-green-600/20 border border-green-600/30'
                     }`}
                   >
                     {delta > 0 ? `+${delta}` : delta}
@@ -213,23 +213,23 @@ const EntityDetail: React.FC = () => {
               </div>
 
               {/* Status Effects - Moved here from sidebar to save space */}
-              <div className="mt-8 pt-6 border-t border-gray-700/50">
-                <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Active Status Effects</h4>
+              <div className="mt-8 pt-6 border-t border-theme-border">
+                <h4 className="text-[10px] font-black text-theme-text-muted uppercase tracking-widest mb-3">Active Status Effects</h4>
                 <div className="flex flex-wrap gap-2">
                   {selectedEntity.statusEffects && JSON.parse(selectedEntity.statusEffects).length > 0 ? (
                     JSON.parse(selectedEntity.statusEffects).map((effect: string) => (
                       <span 
                         key={effect}
-                        className="bg-purple-900/30 text-purple-300 border border-purple-800/50 px-3 py-1 rounded-lg text-xs font-bold flex items-center group cursor-pointer hover:bg-purple-900/50 transition-all"
+                        className="bg-purple-600/10 text-purple-600 border border-purple-600/30 px-3 py-1 rounded-lg text-xs font-bold flex items-center group cursor-pointer hover:bg-purple-600/20 transition-all"
                         onClick={() => handleStatusEffectChange(effect, 'remove')}
                         title="Click to remove"
                       >
                         {effect}
-                        <span className="ml-2 text-purple-500 group-hover:text-purple-300">×</span>
+                        <span className="ml-2 text-purple-400 group-hover:text-purple-600">×</span>
                       </span>
                     ))
                   ) : (
-                    <span className="text-xs text-gray-600 italic">No active effects</span>
+                    <span className="text-xs text-theme-text-muted italic opacity-60">No active effects</span>
                   )}
                 </div>
               </div>
@@ -237,23 +237,23 @@ const EntityDetail: React.FC = () => {
           )}
 
           <section>
-            <h3 className="text-sm font-black text-gray-500 uppercase tracking-widest mb-3">Description</h3>
-            <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 text-gray-300 leading-relaxed">
-              {selectedEntity.description || <span className="italic text-gray-600">No description provided.</span>}
+            <h3 className="text-sm font-black text-theme-text-muted uppercase tracking-widest mb-3">Description</h3>
+            <div className="bg-theme-bg-alt border border-theme-border rounded-xl p-6 text-theme-text leading-relaxed shadow-sm">
+              {selectedEntity.description || <span className="italic text-theme-text-muted opacity-60">No description provided.</span>}
             </div>
           </section>
 
           <section>
-            <h3 className="text-sm font-black text-gray-500 uppercase tracking-widest mb-3">GM Notes</h3>
-            <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 text-gray-300 font-mono text-sm whitespace-pre-wrap min-h-[100px]">
-              {selectedEntity.notes || <span className="italic text-gray-600">No notes yet.</span>}
+            <h3 className="text-sm font-black text-theme-text-muted uppercase tracking-widest mb-3">GM Notes</h3>
+            <div className="bg-theme-bg-alt border border-theme-border rounded-xl p-6 text-theme-text font-mono text-sm whitespace-pre-wrap min-h-[100px] shadow-sm">
+              {selectedEntity.notes || <span className="italic text-theme-text-muted opacity-60">No notes yet.</span>}
             </div>
           </section>
 
           {selectedEntity.type === 'Quest' && (
             <section>
-              <h3 className="text-sm font-black text-gray-500 uppercase tracking-widest mb-3">Objectives</h3>
-              <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 italic text-gray-600">
+              <h3 className="text-sm font-black text-theme-text-muted uppercase tracking-widest mb-3">Objectives</h3>
+              <div className="bg-theme-bg-alt border border-theme-border rounded-xl p-6 italic text-theme-text-muted opacity-60 shadow-sm">
                 Objectives management coming soon...
               </div>
             </section>
@@ -262,7 +262,7 @@ const EntityDetail: React.FC = () => {
 
         <div className="space-y-8">
           <section>
-            <h3 className="text-sm font-black text-gray-500 uppercase tracking-widest mb-3 text-center lg:text-left">Relationships</h3>
+            <h3 className="text-sm font-black text-theme-text-muted uppercase tracking-widest mb-3 text-center lg:text-left">Relationships</h3>
             <div className="space-y-3">
               {relationships.length > 0 ? (
                 relationships.map(rel => {
@@ -274,25 +274,25 @@ const EntityDetail: React.FC = () => {
                     <div 
                       key={rel.id} 
                       onClick={() => target && setSelectedEntity(target)}
-                      className="bg-gray-800 border border-gray-700 p-4 rounded-xl hover:border-blue-500/50 transition-all cursor-pointer group"
+                      className="bg-theme-bg-alt border border-theme-border p-4 rounded-xl hover:border-theme-primary transition-all cursor-pointer group shadow-sm"
                     >
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-blue-500 uppercase tracking-tighter mb-1">
+                        <span className="text-[10px] font-black text-theme-primary uppercase tracking-tighter mb-1">
                           {getRelationshipWording(rel.relationshipType, isSource)}
                         </span>
                         <div className="flex items-center space-x-2">
-                          <span className="text-white font-bold group-hover:text-blue-400 transition-colors">
+                          <span className="text-theme-text font-bold group-hover:text-theme-primary transition-colors">
                             {target?.name || 'Unknown Entity'}
                           </span>
-                          <span className="text-gray-600 text-[10px] uppercase font-bold">{target?.type}</span>
+                          <span className="text-theme-text-muted text-[10px] uppercase font-bold opacity-60">{target?.type}</span>
                         </div>
-                        {rel.notes && <p className="text-gray-500 text-[11px] mt-1 italic">{rel.notes}</p>}
+                        {rel.notes && <p className="text-theme-text-muted text-[11px] mt-1 italic opacity-70">{rel.notes}</p>}
                       </div>
                     </div>
                   );
                 })
               ) : (
-                <div className="text-center py-6 bg-gray-800/30 border border-gray-700 border-dashed rounded-xl text-xs text-gray-600 italic">
+                <div className="text-center py-6 bg-theme-bg-alt border border-theme-border border-dashed rounded-xl text-xs text-theme-text-muted italic opacity-60">
                   No relationships.
                 </div>
               )}

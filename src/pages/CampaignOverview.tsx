@@ -37,7 +37,7 @@ const CampaignOverview: React.FC<CampaignOverviewProps> = ({ campaign }) => {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-theme-primary"></div>
       </div>
     );
   }
@@ -52,16 +52,16 @@ const CampaignOverview: React.FC<CampaignOverviewProps> = ({ campaign }) => {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <header>
-        <h2 className="text-3xl font-bold text-white">{campaign.name}</h2>
-        <p className="text-gray-400 mt-1">{campaign.gameSystem} Campaign Overview</p>
+        <h2 className="text-3xl font-bold text-theme-text">{campaign.name}</h2>
+        <p className="text-theme-text-muted mt-1">{campaign.gameSystem} Campaign Overview</p>
       </header>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {statCards.map((stat) => (
-          <div key={stat.label} className="bg-gray-800 border border-gray-700 p-4 rounded-xl shadow-sm">
+          <div key={stat.label} className="bg-theme-bg-alt border border-theme-border p-4 rounded-xl shadow-sm">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-gray-400 text-sm font-medium">{stat.label}</p>
+                <p className="text-theme-text-muted text-sm font-medium">{stat.label}</p>
                 <p className={`text-2xl font-bold mt-1 ${stat.color}`}>{stat.count}</p>
               </div>
             </div>
@@ -70,38 +70,38 @@ const CampaignOverview: React.FC<CampaignOverviewProps> = ({ campaign }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <section className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-700 bg-gray-800/50 flex justify-between items-center">
-            <h3 className="font-bold text-white uppercase tracking-wider text-sm">Recent Entities</h3>
+        <section className="bg-theme-bg-alt border border-theme-border rounded-xl overflow-hidden shadow-lg">
+          <div className="px-6 py-4 border-b border-theme-border bg-theme-bg/50 flex justify-between items-center">
+            <h3 className="font-bold text-theme-text uppercase tracking-wider text-sm">Recent Entities</h3>
             <button 
               onClick={() => setCurrentView('NPCs')} 
-              className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+              className="text-xs text-theme-primary hover:text-theme-primary-hover transition-colors font-bold"
             >
-              View All
+              VIEW ALL
             </button>
           </div>
-          <div className="divide-y divide-gray-700">
+          <div className="divide-y divide-theme-border">
             {recentEntities.length > 0 ? (
               recentEntities.map((entity) => (
                 <div 
                   key={entity.id} 
                   onClick={() => setSelectedEntity(entity)}
-                  className="px-6 py-4 flex items-center justify-between hover:bg-gray-750 transition-colors cursor-pointer group"
+                  className="px-6 py-4 flex items-center justify-between hover:bg-theme-bg/50 transition-colors cursor-pointer group"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs text-gray-400 group-hover:bg-blue-900/30 group-hover:text-blue-300 transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-theme-bg flex items-center justify-center text-xs text-theme-text-muted group-hover:bg-theme-primary group-hover:text-theme-primary-text transition-colors">
                       {entity.type.substring(0, 1)}
                     </div>
                     <div>
-                      <p className="text-white font-medium text-sm group-hover:text-blue-400 transition-colors">{entity.name}</p>
-                      <p className="text-gray-500 text-xs">{entity.type}</p>
+                      <p className="text-theme-text font-medium text-sm group-hover:text-theme-primary transition-colors">{entity.name}</p>
+                      <p className="text-theme-text-muted text-xs">{entity.type}</p>
                     </div>
                   </div>
-                  <span className="text-gray-600 text-[10px]">{new Date(entity.updatedAt).toLocaleDateString()}</span>
+                  <span className="text-theme-text-muted text-[10px]">{new Date(entity.updatedAt).toLocaleDateString()}</span>
                 </div>
               ))
             ) : (
-              <div className="px-6 py-10 text-center text-gray-500 italic text-sm">
+              <div className="px-6 py-10 text-center text-theme-text-muted italic text-sm">
                 No entities created yet.
               </div>
             )}
@@ -109,32 +109,32 @@ const CampaignOverview: React.FC<CampaignOverviewProps> = ({ campaign }) => {
         </section>
 
         <section className="space-y-4">
-          <h3 className="font-bold text-white uppercase tracking-wider text-sm mb-2">Quick Actions</h3>
+          <h3 className="font-bold text-theme-text uppercase tracking-wider text-sm mb-2">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-4">
             {['NPC', 'Location', 'Quest', 'Faction'].map((type) => (
               <button
                 key={type}
                 onClick={() => setQuickAddType(type as EntityType)}
-                className="flex items-center space-x-3 bg-gray-800 border border-gray-700 p-4 rounded-xl hover:bg-gray-750 hover:border-blue-500/50 transition-all group"
+                className="flex items-center space-x-3 bg-theme-bg-alt border border-theme-border p-4 rounded-xl hover:bg-theme-bg hover:border-theme-primary/50 transition-all group shadow-sm"
               >
-                <div className="w-10 h-10 rounded-lg bg-gray-700 flex items-center justify-center text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                <div className="w-10 h-10 rounded-lg bg-theme-bg flex items-center justify-center text-theme-primary group-hover:bg-theme-primary group-hover:text-theme-primary-text transition-all">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                 </div>
-                <span className="text-white font-medium text-sm">Add {type}</span>
+                <span className="text-theme-text font-medium text-sm">Add {type}</span>
               </button>
             ))}
             <button
               onClick={() => setCurrentView('Notes')}
-              className="flex items-center space-x-3 bg-gray-800 border border-gray-700 p-4 rounded-xl hover:bg-gray-750 hover:border-blue-500/50 transition-all group"
+              className="flex items-center space-x-3 bg-theme-bg-alt border border-theme-border p-4 rounded-xl hover:bg-theme-bg hover:border-theme-primary/50 transition-all group shadow-sm"
             >
-              <div className="w-10 h-10 rounded-lg bg-gray-700 flex items-center justify-center text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+              <div className="w-10 h-10 rounded-lg bg-theme-bg flex items-center justify-center text-theme-primary group-hover:bg-theme-primary group-hover:text-theme-primary-text transition-all">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
               </div>
-              <span className="text-white font-medium text-sm">Add Note</span>
+              <span className="text-theme-text font-medium text-sm">Add Note</span>
             </button>
           </div>
         </section>

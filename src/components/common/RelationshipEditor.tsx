@@ -108,22 +108,22 @@ const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ campaignId, sou
 
   return (
     <div className="space-y-6">
-      <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-4 space-y-4">
-        <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Add Relationship</h4>
+      <div className="bg-theme-bg border border-theme-border rounded-lg p-4 space-y-4 shadow-inner">
+        <h4 className="text-sm font-bold text-theme-text-muted uppercase tracking-widest">Add Relationship</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex flex-col space-y-1">
-            <span className="text-[10px] font-bold text-gray-500 uppercase px-1">Source</span>
-            <div className="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-300">
+            <span className="text-[10px] font-bold text-theme-text-muted uppercase px-1">Source</span>
+            <div className="bg-theme-bg-alt border border-theme-border rounded px-3 py-2 text-sm text-theme-text opacity-70">
               {sourceEntity.name}
             </div>
           </div>
           
           <div className="flex flex-col space-y-1">
-            <label className="text-[10px] font-bold text-gray-500 uppercase px-1">Type</label>
+            <label className="text-[10px] font-bold text-theme-text-muted uppercase px-1">Type</label>
             <select
               value={relationshipType}
               onChange={(e) => setRelationshipType(e.target.value)}
-              className="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+              className="bg-theme-bg-alt border border-theme-border rounded px-3 py-2 text-sm text-theme-text focus:outline-none focus:border-theme-primary transition-colors"
             >
               {RELATIONSHIP_TEMPLATES.map(t => (
                 <option key={t.id} value={t.id}>{t.forward}</option>
@@ -132,11 +132,11 @@ const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ campaignId, sou
           </div>
 
           <div className="flex-col space-y-1 flex">
-            <label className="text-[10px] font-bold text-gray-500 uppercase px-1">Target Entity</label>
+            <label className="text-[10px] font-bold text-theme-text-muted uppercase px-1">Target Entity</label>
             <select
               value={targetEntityId}
               onChange={(e) => setTargetEntityId(e.target.value)}
-              className="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+              className="bg-theme-bg-alt border border-theme-border rounded px-3 py-2 text-sm text-theme-text focus:outline-none focus:border-theme-primary transition-colors"
             >
               <option value="">Select entity...</option>
               {['NPC', 'Location', 'Quest', 'Faction'].map(type => (
@@ -152,20 +152,20 @@ const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ campaignId, sou
         
         <div className="flex items-end space-x-3">
           <div className="flex-1 flex flex-col space-y-1">
-            <label className="text-[10px] font-bold text-gray-500 uppercase px-1">Notes (Optional)</label>
+            <label className="text-[10px] font-bold text-theme-text-muted uppercase px-1">Notes (Optional)</label>
             <input
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Context for this relationship..."
-              className="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+              className="bg-theme-bg-alt border border-theme-border rounded px-3 py-2 text-sm text-theme-text focus:outline-none focus:border-theme-primary transition-colors"
             />
           </div>
           <button
             type="button"
             onClick={handleAdd}
             disabled={!targetEntityId}
-            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500 px-6 py-2 rounded text-sm font-bold transition-all shadow-lg shadow-blue-900/10"
+            className="bg-theme-primary hover:bg-theme-primary-hover disabled:bg-theme-bg-alt disabled:text-theme-text-muted text-theme-primary-text px-6 py-2 rounded text-sm font-bold transition-all shadow-lg shadow-black/10"
           >
             ADD
           </button>
@@ -173,7 +173,7 @@ const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ campaignId, sou
       </div>
 
       <div className="space-y-2">
-        <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest px-1">Current Relationships</h4>
+        <h4 className="text-sm font-bold text-theme-text-muted uppercase tracking-widest px-1">Current Relationships</h4>
         {displayRelationships.length > 0 ? (
           <div className="grid grid-cols-1 gap-2">
             {displayRelationships.map(rel => {
@@ -183,20 +183,20 @@ const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ campaignId, sou
               const isNew = addedRelationships.some(r => r.id === rel.id);
               
               return (
-                <div key={rel.id} className={`bg-gray-800 border ${isNew ? 'border-blue-500/50' : 'border-gray-700'} rounded-lg px-4 py-3 flex items-center justify-between group`}>
+                <div key={rel.id} className={`bg-theme-bg-alt border ${isNew ? 'border-theme-primary' : 'border-theme-border'} rounded-lg px-4 py-3 flex items-center justify-between group shadow-sm`}>
                   <div className="flex items-center space-x-3 text-sm">
-                    <span className="text-gray-400 font-bold">{sourceEntity.name}</span>
-                    <span className="bg-blue-900/30 text-blue-400 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter">
+                    <span className="text-theme-text-muted font-bold">{sourceEntity.name}</span>
+                    <span className="bg-theme-primary/10 text-theme-primary px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter border border-theme-primary/20">
                       {getRelationshipWording(rel.relationshipType, isSource)}
                     </span>
-                    <span className="text-white font-bold">{targetEntity?.name || 'Unknown Entity'}</span>
-                    {rel.notes && <span className="text-gray-500 text-xs italic">- {rel.notes}</span>}
-                    {isNew && <span className="text-[8px] font-black text-blue-500 uppercase bg-blue-500/10 px-1 rounded">New</span>}
+                    <span className="text-theme-text font-bold">{targetEntity?.name || 'Unknown Entity'}</span>
+                    {rel.notes && <span className="text-theme-text-muted text-xs italic">- {rel.notes}</span>}
+                    {isNew && <span className="text-[8px] font-black text-theme-primary uppercase bg-theme-primary/10 px-1 rounded border border-theme-primary/20">New</span>}
                   </div>
                   <button
                     type="button"
                     onClick={() => handleDelete(rel.id!)}
-                    className="text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                    className="text-theme-text-muted hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -207,7 +207,7 @@ const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ campaignId, sou
             })}
           </div>
         ) : (
-          <p className="text-gray-500 text-xs italic px-1">No relationships defined for this entity.</p>
+          <p className="text-theme-text-muted text-xs italic px-1 opacity-60">No relationships defined for this entity.</p>
         )}
       </div>
       <ConfirmDialog

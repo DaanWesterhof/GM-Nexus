@@ -108,11 +108,11 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
   };
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-2xl p-4 shadow-lg hover:border-gray-600 transition-all group overflow-hidden">
+    <div className="bg-theme-bg-alt border border-theme-border rounded-2xl p-4 shadow-lg hover:border-theme-primary transition-all group overflow-hidden relative">
       <div className="flex justify-between items-start mb-3">
         <div className="flex items-center space-x-3">
           {isNpc && npc.image && (
-            <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-700 flex-shrink-0 bg-gray-900">
+            <div className="w-10 h-10 rounded-lg overflow-hidden border border-theme-border flex-shrink-0 bg-theme-bg shadow-sm">
               <img 
                 src={npc.image.startsWith('http') ? npc.image : convertFileSrc(npc.image)} 
                 alt={npc.name} 
@@ -121,13 +121,13 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
             </div>
           )}
           <div>
-            <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors truncate max-w-[150px]">
+            <h3 className="text-lg font-bold text-theme-text group-hover:text-theme-primary transition-colors truncate max-w-[150px]">
               {entity.name}
             </h3>
-            {isNpc && <span className="text-[10px] bg-blue-900/40 text-blue-400 px-1.5 py-0.5 rounded uppercase tracking-tighter">NPC</span>}
+            {isNpc && <span className="text-[10px] bg-theme-primary/10 text-theme-primary px-1.5 py-0.5 rounded uppercase tracking-tighter font-bold border border-theme-primary/20">NPC</span>}
             <button 
               onClick={() => setShowStatusModal(true)}
-              className="ml-2 text-[9px] text-blue-400 hover:text-blue-300 font-bold uppercase tracking-tighter inline-flex items-center bg-blue-900/20 px-1.5 py-0.5 rounded border border-blue-800/30 transition-colors"
+              className="ml-2 text-[9px] text-theme-primary hover:text-theme-primary-hover font-bold uppercase tracking-tighter inline-flex items-center bg-theme-primary/10 px-1.5 py-0.5 rounded border border-theme-primary/20 transition-colors shadow-sm"
             >
               + ADD
             </button>
@@ -135,7 +135,7 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
         </div>
         <button 
           onClick={handleRemove}
-          className="text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="text-theme-text-muted hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
         >
           &times;
         </button>
@@ -144,21 +144,21 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
       <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex justify-between items-end relative">
-            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Health</span>
+            <span className="text-[10px] font-black text-theme-text-muted uppercase tracking-widest">Health</span>
             
             <div className="flex items-center space-x-1">
               <input 
                 type="number"
                 value={currentHealth}
                 onChange={(e) => handleDirectEdit(e.target.value)}
-                className="w-12 bg-transparent text-right font-bold text-xl text-white focus:outline-none focus:bg-gray-700 rounded transition-colors"
+                className="w-12 bg-transparent text-right font-bold text-xl text-theme-text focus:outline-none focus:bg-theme-bg rounded transition-colors"
               />
-              <span className="text-gray-500 text-sm">/ {maxHealth}</span>
+              <span className="text-theme-text-muted text-sm">/ {maxHealth}</span>
             </div>
           </div>
 
         {/* Health Bar */}
-        <div className="h-3 bg-gray-900 rounded-full overflow-hidden border border-gray-700 shadow-inner">
+        <div className="h-3 bg-theme-bg rounded-full overflow-hidden border border-theme-border shadow-inner">
           <div 
             className={`h-full transition-all duration-300 ${getHealthColor()}`}
             style={{ width: `${healthPercentage}%` }}
@@ -171,10 +171,10 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
             <button
               key={delta}
               onClick={() => handleHealthChange(delta)}
-              className={`py-2 rounded-lg text-[10px] font-black transition-all ${
+              className={`py-2 rounded-lg text-[10px] font-black transition-all shadow-sm ${
                 delta < 0 
-                  ? 'bg-red-900/20 text-red-400 hover:bg-red-900/40 border border-red-900/30' 
-                  : 'bg-green-900/20 text-green-400 hover:bg-green-900/40 border border-green-900/30'
+                  ? 'bg-red-600/10 text-red-500 hover:bg-red-600/20 border border-red-600/30' 
+                  : 'bg-green-600/10 text-green-500 hover:bg-green-600/20 border border-green-600/30'
               }`}
             >
               {delta > 0 ? `+${delta}` : delta}
@@ -187,12 +187,12 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
           {statusEffects.map(effect => (
             <span 
               key={effect}
-              className="bg-purple-900/30 text-purple-300 border border-purple-800/50 px-2 py-0.5 rounded text-[10px] font-bold flex items-center group cursor-pointer hover:bg-purple-900/50 transition-all"
+              className="bg-purple-600/10 text-purple-600 border border-purple-600/30 px-2 py-0.5 rounded text-[10px] font-bold flex items-center group cursor-pointer hover:bg-purple-600/20 transition-all shadow-sm"
               onClick={() => handleStatusEffectChange(effect, 'remove')}
               title="Click to remove"
             >
               {effect}
-              <span className="ml-1 text-purple-500 group-hover:text-purple-300">×</span>
+              <span className="ml-1 text-purple-400 group-hover:text-purple-600">×</span>
             </span>
           ))}
         </div>
@@ -201,9 +201,9 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
 
     {/* Add Status Modal - Inline for simplicity */}
       {showStatusModal && (
-        <div className="absolute inset-0 bg-gray-900/90 z-20 flex items-center justify-center p-4">
-          <div className="bg-gray-800 border border-gray-700 p-4 rounded-xl w-full">
-            <h4 className="text-sm font-bold text-white mb-3">Add Status Effect</h4>
+        <div className="absolute inset-0 bg-theme-bg/95 z-20 flex items-center justify-center p-4 backdrop-blur-sm transition-all animate-in fade-in duration-200">
+          <div className="bg-theme-bg-alt border border-theme-border p-4 rounded-xl w-full shadow-2xl">
+            <h4 className="text-sm font-bold text-theme-text mb-3 uppercase tracking-wider">Add Status Effect</h4>
             <input 
               type="text"
               autoFocus
@@ -211,17 +211,17 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
               value={newStatusName}
               onChange={(e) => setNewStatusName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddStatus()}
-              className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white mb-4 focus:outline-none focus:border-blue-500"
+              className="w-full bg-theme-bg border border-theme-border rounded-lg px-3 py-2 text-sm text-theme-text mb-4 focus:outline-none focus:border-theme-primary transition-all"
             />
             <div className="flex justify-end space-x-2">
               <button 
                 onClick={() => setShowStatusModal(false)}
-                className="px-3 py-1.5 text-xs text-gray-400 hover:text-white"
-              >Cancel</button>
+                className="px-3 py-1.5 text-xs text-theme-text-muted hover:text-theme-text font-bold transition-colors"
+              >CANCEL</button>
               <button 
                 onClick={handleAddStatus}
-                className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
-              >Add Status</button>
+                className="px-3 py-1.5 text-xs bg-theme-primary hover:bg-theme-primary-hover text-theme-primary-text font-bold rounded-lg shadow-sm transition-all"
+              >ADD STATUS</button>
             </div>
           </div>
         </div>

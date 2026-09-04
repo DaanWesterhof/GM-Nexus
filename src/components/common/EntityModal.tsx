@@ -88,10 +88,10 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
-        <div className="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-800/80 sticky top-0 z-10">
+      <div className="bg-theme-bg border border-theme-border rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="px-6 py-4 border-b border-theme-border flex justify-between items-center bg-theme-bg-alt sticky top-0 z-10">
           <div>
-            <h3 className="text-xl font-bold text-white">
+            <h3 className="text-xl font-bold text-theme-text">
               {initialData ? `Edit ${type}` : `New ${type}`}
             </h3>
             {initialData && (
@@ -99,21 +99,21 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
                 <button 
                   type="button"
                   onClick={() => setActiveTab('details')}
-                  className={`text-xs font-bold uppercase tracking-widest pb-1 border-b-2 transition-all ${activeTab === 'details' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-300'}`}
+                  className={`text-xs font-bold uppercase tracking-widest pb-1 border-b-2 transition-all ${activeTab === 'details' ? 'border-theme-primary text-theme-text' : 'border-transparent text-theme-text-muted hover:text-theme-text'}`}
                 >
                   Details
                 </button>
                 <button 
                   type="button"
                   onClick={() => setActiveTab('relationships')}
-                  className={`text-xs font-bold uppercase tracking-widest pb-1 border-b-2 transition-all ${activeTab === 'relationships' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-300'}`}
+                  className={`text-xs font-bold uppercase tracking-widest pb-1 border-b-2 transition-all ${activeTab === 'relationships' ? 'border-theme-primary text-theme-text' : 'border-transparent text-theme-text-muted hover:text-theme-text'}`}
                 >
                   Relationships
                 </button>
               </div>
             )}
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-theme-text-muted hover:text-theme-text transition-colors">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -125,14 +125,14 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
             {activeTab === 'details' ? (
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Name*</label>
+                  <label className="block text-sm font-bold text-theme-text-muted mb-1 uppercase tracking-wider">Name*</label>
                   <input
                     autoFocus
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                    className="w-full bg-theme-bg border border-theme-border rounded-lg px-4 py-2.5 text-theme-text focus:outline-none focus:border-theme-primary transition-colors"
                     placeholder={`Name of the ${type.toLowerCase()}`}
                   />
                 </div>
@@ -140,21 +140,21 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
                 {type === 'NPC' && (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Current Health</label>
+                      <label className="block text-sm font-bold text-wood-400/60 dark:text-gray-400 mb-1 uppercase tracking-wider">Current Health</label>
                       <input
                         type="number"
                         value={currentHealth}
                         onChange={(e) => setCurrentHealth(e.target.value)}
-                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full bg-parchment-50 dark:bg-gray-900 border border-wood-500/10 dark:border-gray-700 rounded-lg px-4 py-2.5 text-wood-900 dark:text-white focus:outline-none focus:border-wood-400 transition-colors"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Max Health</label>
+                      <label className="block text-sm font-bold text-wood-400/60 dark:text-gray-400 mb-1 uppercase tracking-wider">Max Health</label>
                       <input
                         type="number"
                         value={maxHealth}
                         onChange={(e) => setMaxHealth(e.target.value)}
-                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full bg-parchment-50 dark:bg-gray-900 border border-wood-500/10 dark:border-gray-700 rounded-lg px-4 py-2.5 text-wood-900 dark:text-white focus:outline-none focus:border-wood-400 transition-colors"
                       />
                     </div>
                   </div>
@@ -162,11 +162,11 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
 
                 {type === 'Quest' && (
                   <div>
-                    <label className="block text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Status</label>
+                    <label className="block text-sm font-bold text-wood-400/60 dark:text-gray-400 mb-1 uppercase tracking-wider">Status</label>
                     <select
                       value={status}
                       onChange={(e) => setStatus(e.target.value as QuestStatus)}
-                      className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                      className="w-full bg-parchment-50 dark:bg-gray-900 border border-wood-500/10 dark:border-gray-700 rounded-lg px-4 py-2.5 text-wood-900 dark:text-white focus:outline-none focus:border-wood-400 transition-colors"
                     >
                       <option value="Planned">Planned</option>
                       <option value="Active">Active</option>
@@ -178,21 +178,21 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
                 )}
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Image</label>
+                  <label className="block text-sm font-bold text-wood-400/60 dark:text-gray-400 mb-1 uppercase tracking-wider">Image</label>
                   <div className="flex space-x-2">
                     <div className="flex-1">
                       <input
                         type="text"
                         value={image || ''}
                         onChange={(e) => setImage(e.target.value)}
-                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full bg-parchment-50 dark:bg-gray-900 border border-wood-500/10 dark:border-gray-700 rounded-lg px-4 py-2.5 text-wood-900 dark:text-white focus:outline-none focus:border-wood-400 transition-colors"
                         placeholder="Image URL or Path"
                       />
                     </div>
                     <button
                       type="button"
                       onClick={handleSelectImage}
-                      className="px-4 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center"
+                      className="px-4 bg-wood-600 hover:bg-wood-700 text-white rounded-lg transition-colors flex items-center justify-center shadow-sm"
                       title="Select image file"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,7 +201,7 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
                     </button>
                   </div>
                   {image && (
-                    <div className="mt-2 h-32 w-full rounded-lg overflow-hidden border border-gray-700 bg-gray-900">
+                    <div className="mt-2 h-32 w-full rounded-lg overflow-hidden border border-wood-500/20 dark:border-gray-700 bg-parchment-50 dark:bg-gray-900">
                       <img 
                         src={image.startsWith('http') ? image : convertFileSrc(image)} 
                         alt="Preview" 
@@ -213,23 +213,23 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Description</label>
+                  <label className="block text-sm font-bold text-wood-400/60 dark:text-gray-400 mb-1 uppercase tracking-wider">Description</label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition-colors resize-none"
+                    className="w-full bg-parchment-50 dark:bg-gray-900 border border-wood-500/10 dark:border-gray-700 rounded-lg px-4 py-2.5 text-wood-900 dark:text-white focus:outline-none focus:border-wood-400 transition-colors resize-none"
                     placeholder="Brief summary..."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Notes</label>
+                  <label className="block text-sm font-bold text-wood-400/60 dark:text-gray-400 mb-1 uppercase tracking-wider">Notes</label>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     rows={6}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition-colors font-mono text-sm"
+                    className="w-full bg-parchment-50 dark:bg-gray-900 border border-wood-500/10 dark:border-gray-700 rounded-lg px-4 py-2.5 text-wood-900 dark:text-white focus:outline-none focus:border-wood-400 transition-colors font-mono text-sm"
                     placeholder="Detailed notes, backstory, or GM info..."
                   />
                 </div>
@@ -245,17 +245,17 @@ const EntityModal: React.FC<EntityModalProps> = ({ isOpen, onClose, onSave, init
             )}
           </div>
 
-          <div className="px-6 py-4 bg-gray-800/50 border-t border-gray-700 flex justify-end space-x-3 sticky bottom-0">
+          <div className="px-6 py-4 bg-theme-bg-alt border-t border-theme-border flex justify-end space-x-3 sticky bottom-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors"
+              className="px-4 py-2 text-sm font-medium text-theme-text-muted hover:text-theme-text transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg text-sm font-bold text-white transition-all shadow-lg shadow-blue-900/20"
+              className="bg-theme-primary hover:bg-theme-primary-hover px-6 py-2 rounded-lg text-sm font-bold text-theme-primary-text transition-all shadow-lg shadow-black/10"
             >
               Save {type}
             </button>

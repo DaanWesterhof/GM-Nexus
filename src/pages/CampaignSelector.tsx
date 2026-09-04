@@ -77,12 +77,12 @@ const CampaignSelector: React.FC = () => {
     <div className="max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h2 className="text-3xl font-bold text-white">Select Campaign</h2>
-          <p className="text-gray-400 mt-1">Choose a campaign to manage or create a new one.</p>
+          <h2 className="text-3xl font-bold text-theme-text">Select Campaign</h2>
+          <p className="text-theme-text-muted mt-1">Choose a campaign to manage or create a new one.</p>
         </div>
         <button 
           onClick={handleCreateCampaign}
-          className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-blue-900/20"
+          className="bg-theme-primary hover:bg-theme-primary-hover text-theme-primary-text px-6 py-2 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-black/20"
         >
           + New Campaign
         </button>
@@ -90,14 +90,14 @@ const CampaignSelector: React.FC = () => {
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-theme-primary"></div>
         </div>
       ) : campaigns.length === 0 ? (
-        <div className="text-center py-20 bg-gray-800/50 rounded-xl border-2 border-gray-700 border-dashed">
-          <p className="text-gray-400 text-lg mb-6">No campaigns found.</p>
+        <div className="text-center py-20 bg-theme-bg-alt/50 rounded-xl border-2 border-theme-border border-dashed">
+          <p className="text-theme-text-muted text-lg mb-6">No campaigns found.</p>
           <button 
             onClick={handleCreateCampaign}
-            className="bg-gray-700 hover:bg-gray-600 px-6 py-2 rounded-lg text-sm font-semibold transition-all"
+            className="bg-theme-bg-alt hover:bg-theme-bg px-6 py-2 rounded-lg text-sm font-semibold transition-all border border-theme-border text-theme-text"
           >
             Create your first campaign
           </button>
@@ -107,17 +107,17 @@ const CampaignSelector: React.FC = () => {
           {campaigns.map((campaign) => (
             <div 
               key={campaign.id} 
-              className="group bg-gray-800 border border-gray-700 rounded-xl p-6 hover:border-blue-500/50 hover:bg-gray-800/80 transition-all cursor-pointer shadow-lg"
+              className="group bg-theme-bg-alt border border-theme-border rounded-xl p-6 hover:border-theme-primary/50 hover:bg-theme-bg transition-all cursor-pointer shadow-lg"
               onClick={() => setActiveCampaign(campaign)}
             >
               <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-bold group-hover:text-blue-400 transition-colors">{campaign.name}</h3>
-                <span className="bg-gray-700 text-xs px-2 py-1 rounded text-gray-300 font-medium">
+                <h3 className="text-xl font-bold group-hover:text-theme-primary transition-colors text-theme-text">{campaign.name}</h3>
+                <span className="bg-theme-bg text-xs px-2 py-1 rounded text-theme-text-muted font-medium border border-theme-border">
                   {campaign.gameSystem}
                 </span>
               </div>
               
-              <div className="flex items-center text-xs text-gray-500 space-x-4 mb-6">
+              <div className="flex items-center text-xs text-theme-text-muted space-x-4 mb-6">
                 <span>Created: {new Date(campaign.createdAt).toLocaleDateString()}</span>
               </div>
 
@@ -127,7 +127,7 @@ const CampaignSelector: React.FC = () => {
                     e.stopPropagation();
                     handleEditCampaign(campaign);
                   }}
-                  className="text-sm text-gray-400 hover:text-white transition-colors"
+                  className="text-sm text-theme-text-muted hover:text-theme-text transition-colors"
                 >
                   Edit
                 </button>
@@ -136,7 +136,7 @@ const CampaignSelector: React.FC = () => {
                     e.stopPropagation();
                     handleDeleteCampaign(campaign.id);
                   }}
-                  className="text-sm text-red-400 hover:text-red-300 transition-colors"
+                  className="text-sm text-red-500 hover:text-red-400 transition-colors"
                 >
                   Delete
                 </button>
