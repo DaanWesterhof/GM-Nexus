@@ -87,7 +87,7 @@ const Sidebar: React.FC = () => {
       <div className="p-4 border-t border-gray-700 space-y-4">
         <button
           onClick={() => {
-            navigator.clipboard.writeText('http://localhost:1420/overlay.html');
+            navigator.clipboard.writeText('http://127.0.0.1:3030/overlay.html');
             alert('OBS Browser Source URL copied to clipboard!');
           }}
           className="w-full flex items-center justify-center space-x-2 py-2 bg-blue-900/20 border border-blue-900/50 text-blue-400 rounded-lg text-xs font-bold hover:bg-blue-900/40 transition-all mb-2"

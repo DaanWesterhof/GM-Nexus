@@ -106,7 +106,7 @@ const PlayerOverlayCard: React.FC<{
       <div className="relative w-16 h-16 mr-4 flex-shrink-0">
         {player.image ? (
           <img 
-            src={player.image.startsWith('http') || player.image.startsWith('data:') ? player.image : `http://127.0.0.1:3030/assets/${encodeURIComponent(player.image)}`} 
+            src={player.image.startsWith('http') || player.image.startsWith('data:') ? player.image : `http://127.0.0.1:3030/player-assets/${encodeURIComponent(player.image)}`} 
             alt={player.name}
             className="w-full h-full object-cover rounded-full border-2 border-white/40"
           />
