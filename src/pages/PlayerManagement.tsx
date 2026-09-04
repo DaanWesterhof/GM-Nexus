@@ -14,7 +14,7 @@ const PlayerManagement: React.FC = () => {
   const [name, setName] = useState('');
   const [image, setImage] = useState('');
   const [status, setStatus] = useState('');
-  const [resources, setResources] = useState<{name: string, max: number, style: string}[]>([
+  const [resources, setResources] = useState<{id?: string, name: string, max: number, style: string}[]>([
     { name: 'Health', max: 10, style: 'bar' }
   ]);
 
@@ -35,7 +35,7 @@ const PlayerManagement: React.FC = () => {
   const loadPlayerResources = async (playerId: string) => {
     const res = await playerService.getResources(playerId);
     if (res.length > 0) {
-      setResources(res.map(r => ({ name: r.name, max: r.maxValue, style: r.displayStyle })));
+      setResources(res.map(r => ({ id: r.id, name: r.name, max: r.maxValue, style: r.displayStyle })));
     }
   };
 
@@ -76,17 +76,27 @@ const PlayerManagement: React.FC = () => {
         });
       }
 
-      // Handle resources (Simplified: replace all for now or just ensure Health exists)
-      // In a real app we'd want more granular control
-      const existingResources = editingPlayer ? await playerService.getResources(playerId) : [];
-      
-      // Simple logic: if new resources differ, we could update them.
-      // For this phase, let's just ensure we create the ones specified if they don't exist.
+      // Handle resources
+      const dbResources = editingPlayer ? await playerService.getResources(playerId) : [];
+
+      // 1. Delete resources that were removed in the UI
+      for (const dbRes of dbResources) {
+        if (!resources.find(r => r.id === dbRes.id)) {
+          await playerService.deleteResource(dbRes.id);
+        }
+      }
+
+      // 2. Create or Update resources
       for (const res of resources) {
-        const existing = existingResources.find(r => r.name === res.name);
-        if (existing) {
-          // Maybe update max? Skipping for simplicity unless changed
+        if (res.id) {
+          // Update existing
+          await playerService.updateResourceMetadata(res.id, {
+            name: res.name,
+            maxValue: res.max,
+            displayStyle: res.style
+          });
         } else {
+          // Create new
           await playerService.createResource({
             id: crypto.randomUUID(),
             playerId,

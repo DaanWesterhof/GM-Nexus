@@ -80,6 +80,20 @@ export const playerService = {
     );
   },
 
+  async updateResourceMetadata(id: string, updates: Partial<Omit<PlayerResource, 'id' | 'playerId' | 'createdAt' | 'updatedAt'>>): Promise<void> {
+    const db = await getDatabase();
+    const fields = Object.keys(updates);
+    if (fields.length === 0) return;
+
+    const setClause = fields.map(field => `${field} = ?`).join(', ');
+    const values = fields.map(field => (updates as any)[field]);
+    
+    await db.execute(
+      `UPDATE player_resources SET ${setClause}, updatedAt = CURRENT_TIMESTAMP WHERE id = ?`,
+      [...values, id]
+    );
+  },
+
   async deleteResource(id: string): Promise<void> {
     const db = await getDatabase();
     await db.execute('DELETE FROM player_resources WHERE id = ?', [id]);
