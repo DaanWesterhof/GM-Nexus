@@ -74,7 +74,7 @@ export const setSetting = async (key: string, value: any, campaignId?: string): 
 
     if (existing !== null) {
       let query = 'UPDATE settings SET value = ?, updatedAt = ? WHERE key = ?';
-      let params = [stringifiedValue, now, key];
+      let params: any[] = [stringifiedValue, now, key];
       
       if (campaignId) {
         query += ' AND campaignId = ?';

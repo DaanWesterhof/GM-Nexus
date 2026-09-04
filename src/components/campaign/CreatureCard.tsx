@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Creature, CampaignEntity } from '../../types';
+import { useAppContext } from '../../store/AppContext';
 import { creatureService } from '../../services/creatureService';
 import { entityService } from '../../services/entityService';
 import { convertFileSrc } from '@tauri-apps/api/core';
@@ -13,6 +14,7 @@ interface CreatureCardProps {
 }
 
 const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, onDelete }) => {
+  const { playingSettings } = useAppContext();
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [newStatusName, setNewStatusName] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -108,57 +110,89 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
   };
 
   return (
-    <div className="bg-theme-bg-alt border border-theme-border rounded-2xl p-4 shadow-lg hover:border-theme-primary transition-all group overflow-hidden relative">
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex items-center space-x-3">
-          {isNpc && npc.image && (
-            <div className="w-10 h-10 rounded-lg overflow-hidden border border-theme-border flex-shrink-0 bg-theme-bg shadow-sm">
-              <img 
-                src={npc.image.startsWith('http') ? npc.image : convertFileSrc(npc.image)} 
-                alt={npc.name} 
-                className="w-full h-full object-cover"
-              />
+    <div className={`bg-theme-bg-alt border border-theme-border rounded-2xl shadow-lg hover:border-theme-primary transition-all group overflow-hidden relative flex ${playingSettings.layoutMode === 'focused' ? 'flex-row h-32 p-0' : 'flex-col p-4'}`}>
+      {playingSettings.layoutMode === 'focused' ? (
+        <div className="relative bg-theme-bg w-24 flex-shrink-0 border-r border-theme-border overflow-hidden">
+          {isNpc && npc.image ? (
+            <img 
+              src={npc.image.startsWith('http') ? npc.image : convertFileSrc(npc.image)} 
+              alt={npc.name} 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-theme-text-muted text-2xl">
+              {isNpc ? '👤' : '👾'}
             </div>
           )}
-          <div>
-            <h3 className="text-lg font-bold text-theme-text group-hover:text-theme-primary transition-colors truncate max-w-[150px]">
-              {entity.name}
-            </h3>
-            {isNpc && <span className="text-[10px] bg-theme-primary/10 text-theme-primary px-1.5 py-0.5 rounded uppercase tracking-tighter font-bold border border-theme-primary/20">NPC</span>}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-2 flex flex-col justify-end">
+            <h3 className="text-[10px] font-black text-white truncate leading-tight mb-1">{entity.name}</h3>
+            {isNpc && <span className="text-[7px] text-theme-primary-text bg-theme-primary/80 px-1 py-0.5 rounded uppercase font-bold self-start mb-1">NPC</span>}
             <button 
               onClick={() => setShowStatusModal(true)}
-              className="ml-2 text-[9px] text-theme-primary hover:text-theme-primary-hover font-bold uppercase tracking-tighter inline-flex items-center bg-theme-primary/10 px-1.5 py-0.5 rounded border border-theme-primary/20 transition-colors shadow-sm"
+              className="text-[7px] text-white hover:opacity-90 font-bold uppercase tracking-tighter bg-theme-primary/60 px-1 py-0.5 rounded border border-theme-primary/30 transition-all backdrop-blur-sm active:scale-95 text-center"
             >
-              + ADD
+              + STATUS
             </button>
           </div>
+          <button 
+            onClick={handleRemove}
+            className="absolute top-1 right-1 text-white/50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+          >
+            &times;
+          </button>
         </div>
-        <button 
-          onClick={handleRemove}
-          className="text-theme-text-muted hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-        >
-          &times;
-        </button>
-      </div>
+      ) : (
+        <div className="flex justify-between items-start mb-3">
+          <div className="flex items-center space-x-3">
+            {isNpc && npc.image && (
+              <div className="w-10 h-10 rounded-lg overflow-hidden border border-theme-border flex-shrink-0 bg-theme-bg shadow-sm">
+                <img 
+                  src={npc.image.startsWith('http') ? npc.image : convertFileSrc(npc.image)} 
+                  alt={npc.name} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            <div>
+              <h3 className="text-lg font-bold text-theme-text group-hover:text-theme-primary transition-colors truncate max-w-[150px]">
+                {entity.name}
+              </h3>
+              {isNpc && <span className="text-[10px] bg-theme-primary/10 text-theme-primary px-1.5 py-0.5 rounded uppercase tracking-tighter font-bold border border-theme-primary/20">NPC</span>}
+              <button 
+                onClick={() => setShowStatusModal(true)}
+                className="ml-2 text-[9px] text-theme-primary hover:text-theme-primary-hover font-bold uppercase tracking-tighter inline-flex items-center bg-theme-primary/10 px-1.5 py-0.5 rounded border border-theme-primary/20 transition-colors shadow-sm"
+              >
+                + ADD
+              </button>
+            </div>
+          </div>
+          <button 
+            onClick={handleRemove}
+            className="text-theme-text-muted hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            &times;
+          </button>
+        </div>
+      )}
 
-      <div className="space-y-4">
-        <div className="space-y-2">
+      <div className={`flex-1 flex flex-col min-w-0 ${playingSettings.layoutMode === 'focused' ? 'p-3 justify-center' : 'space-y-4'}`}>
+        <div className={playingSettings.layoutMode === 'focused' ? 'space-y-1' : 'space-y-2'}>
           <div className="flex justify-between items-end relative">
-            <span className="text-[10px] font-black text-theme-text-muted uppercase tracking-widest">Health</span>
+            <span className={`font-black text-theme-text-muted uppercase tracking-widest ${playingSettings.layoutMode === 'focused' ? 'text-[9px]' : 'text-[10px]'}`}>Health</span>
             
             <div className="flex items-center space-x-1">
               <input 
                 type="number"
                 value={currentHealth}
                 onChange={(e) => handleDirectEdit(e.target.value)}
-                className="w-12 bg-transparent text-right font-bold text-xl text-theme-text focus:outline-none focus:bg-theme-bg rounded transition-colors"
+                className={`w-10 bg-transparent text-right font-bold text-theme-text focus:outline-none focus:bg-theme-bg rounded transition-colors ${playingSettings.layoutMode === 'focused' ? 'text-sm' : 'text-xl'}`}
               />
-              <span className="text-theme-text-muted text-sm">/ {maxHealth}</span>
+              <span className={`text-theme-text-muted ${playingSettings.layoutMode === 'focused' ? 'text-[10px]' : 'text-sm'}`}>/ {maxHealth}</span>
             </div>
           </div>
 
         {/* Health Bar */}
-        <div className="h-3 bg-theme-bg rounded-full overflow-hidden border border-theme-border shadow-inner">
+        <div className={`${playingSettings.layoutMode === 'focused' ? 'h-2' : 'h-3'} bg-theme-bg rounded-full overflow-hidden border border-theme-border shadow-inner`}>
           <div 
             className={`h-full transition-all duration-300 ${getHealthColor()}`}
             style={{ width: `${healthPercentage}%` }}
@@ -166,12 +200,12 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
         </div>
 
         {/* Quick Buttons */}
-        <div className="grid grid-cols-6 gap-1 mt-2">
-          {[-10, -5, -1, 1, 5, 10].map(delta => (
+        <div className={`grid grid-cols-6 gap-1 mt-2 ${playingSettings.layoutMode === 'focused' ? 'scale-90 origin-left' : ''}`}>
+          {[...playingSettings.healthIncrements.map(v => -v).reverse(), ...playingSettings.healthIncrements].map(delta => (
             <button
               key={delta}
               onClick={() => handleHealthChange(delta)}
-              className={`py-2 rounded-lg text-[10px] font-black transition-all shadow-sm ${
+              className={`${playingSettings.layoutMode === 'focused' ? 'py-1 text-[8px]' : 'py-2 text-[10px]'} rounded-lg font-black transition-all shadow-sm ${
                 delta < 0 
                   ? 'bg-red-600/10 text-red-500 hover:bg-red-600/20 border border-red-600/30' 
                   : 'bg-green-600/10 text-green-500 hover:bg-green-600/20 border border-green-600/30'
@@ -182,20 +216,22 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
           ))}
         </div>
 
-        {/* Status Effects - Placed below controls to save space */}
-        <div className="flex flex-wrap gap-1 min-h-[1.25rem] mt-3">
-          {statusEffects.map(effect => (
-            <span 
-              key={effect}
-              className="bg-purple-600/10 text-purple-600 border border-purple-600/30 px-2 py-0.5 rounded text-[10px] font-bold flex items-center group cursor-pointer hover:bg-purple-600/20 transition-all shadow-sm"
-              onClick={() => handleStatusEffectChange(effect, 'remove')}
-              title="Click to remove"
-            >
-              {effect}
-              <span className="ml-1 text-purple-400 group-hover:text-purple-600">×</span>
-            </span>
-          ))}
-        </div>
+        {/* Status Effects */}
+        {playingSettings.layoutMode !== 'focused' && (
+          <div className="flex flex-wrap gap-1 min-h-[1.25rem] mt-3">
+            {statusEffects.map(effect => (
+              <span 
+                key={effect}
+                className="bg-purple-600/10 text-purple-600 border border-purple-600/30 px-2 py-0.5 rounded text-[10px] font-bold flex items-center group cursor-pointer hover:bg-purple-600/20 transition-all shadow-sm"
+                onClick={() => handleStatusEffectChange(effect, 'remove')}
+                title="Click to remove"
+              >
+                {effect}
+                <span className="ml-1 text-purple-400 group-hover:text-purple-600">×</span>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
 

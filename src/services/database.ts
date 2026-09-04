@@ -226,13 +226,47 @@ export const initializeDatabase = async () => {
 
   await database.execute(`
     CREATE TABLE IF NOT EXISTS settings (
-      key TEXT PRIMARY KEY,
+      key TEXT NOT NULL,
       value TEXT NOT NULL,
       campaignId TEXT,
       updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (key, campaignId),
       FOREIGN KEY (campaignId) REFERENCES campaigns (id) ON DELETE CASCADE
     );
   `);
+
+  // Migration: Fix settings table primary key to allow per-campaign settings
+  try {
+    // Check if we need to migrate
+    const settingsColumns = await database.select<any[]>('PRAGMA table_info(settings)');
+    const pkCount = settingsColumns.filter(c => c.pk > 0).length;
+    const isSinglePk = pkCount === 1 && settingsColumns.find(c => c.pk === 1)?.name === 'key';
+
+    if (isSinglePk) {
+      console.log('Migrating settings table to composite primary key...');
+      // 1. Create new table
+      await database.execute(`
+        CREATE TABLE settings_new (
+          key TEXT NOT NULL,
+          value TEXT NOT NULL,
+          campaignId TEXT,
+          updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (key, campaignId),
+          FOREIGN KEY (campaignId) REFERENCES campaigns (id) ON DELETE CASCADE
+        )
+      `);
+      
+      // 2. Copy data
+      await database.execute('INSERT INTO settings_new SELECT key, value, campaignId, updatedAt FROM settings');
+      
+      // 3. Drop old table and rename new one
+      await database.execute('DROP TABLE settings');
+      await database.execute('ALTER TABLE settings_new RENAME TO settings');
+      console.log('Settings table migration complete.');
+    }
+  } catch (e) {
+    console.error('Migration failed for settings table:', e);
+  }
 };
 
 export const exportDatabase = async (): Promise<string> => {

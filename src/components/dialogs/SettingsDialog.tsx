@@ -8,7 +8,16 @@ import { open } from '@tauri-apps/plugin-dialog';
 type Tab = 'general' | 'overlay' | 'campaign' | 'playing';
 
 const SettingsDialog: React.FC = () => {
-  const { isSettingsOpen, setIsSettingsOpen, activeCampaign, setActiveCampaign, theme, setTheme, refreshFeatureToggles } = useAppContext();
+  const { 
+    isSettingsOpen, 
+    setIsSettingsOpen, 
+    activeCampaign, 
+    setActiveCampaign, 
+    theme, 
+    setTheme, 
+    refreshFeatureToggles,
+    refreshPlayingSettings
+  } = useAppContext();
   const [activeTab, setActiveTab] = useState<Tab>('general');
   const [settings, setSettings] = useState<any>({});
   const [importPreview, setImportPreview] = useState<[string, string][] | null>(null);
@@ -52,7 +61,8 @@ const SettingsDialog: React.FC = () => {
     // Set defaults if null
     if (newSettings[SETTINGS_KEYS.WS_PORT] === null) newSettings[SETTINGS_KEYS.WS_PORT] = 3030;
     if (newSettings[SETTINGS_KEYS.WS_FREQUENCY] === null) newSettings[SETTINGS_KEYS.WS_FREQUENCY] = 500;
-    if (newSettings[SETTINGS_KEYS.PLAYING_HEALTH_INCREMENTS] === null) newSettings[SETTINGS_KEYS.PLAYING_HEALTH_INCREMENTS] = [1, 3, 10];
+    if (newSettings[SETTINGS_KEYS.PLAYING_HEALTH_INCREMENTS] === null) newSettings[SETTINGS_KEYS.PLAYING_HEALTH_INCREMENTS] = [1, 5, 10];
+    if (newSettings[SETTINGS_KEYS.PLAYING_LAYOUT_MODE] === null) newSettings[SETTINGS_KEYS.PLAYING_LAYOUT_MODE] = 'balanced';
 
     setSettings(newSettings);
   };
@@ -82,6 +92,11 @@ const SettingsDialog: React.FC = () => {
     // Refresh feature toggles if they were changed
     if (key === SETTINGS_KEYS.CAMPAIGN_FEATURE_TOGGLES) {
       refreshFeatureToggles();
+    }
+
+    // Refresh playing settings if they were changed
+    if (key === SETTINGS_KEYS.PLAYING_HEALTH_INCREMENTS || key === SETTINGS_KEYS.PLAYING_LAYOUT_MODE) {
+      await refreshPlayingSettings();
     }
   };
 
@@ -362,6 +377,7 @@ const SettingsDialog: React.FC = () => {
                             checked={isEnabled}
                             onChange={(e) => {
                               const newToggles = { ...toggles, [feature]: e.target.checked };
+                              setSettings((prev: any) => ({ ...prev, [SETTINGS_KEYS.CAMPAIGN_FEATURE_TOGGLES]: newToggles }));
                               updateCampaignSetting(SETTINGS_KEYS.CAMPAIGN_FEATURE_TOGGLES, newToggles);
                             }}
                             className="form-checkbox h-5 w-5 text-theme-primary rounded cursor-pointer"
@@ -377,7 +393,9 @@ const SettingsDialog: React.FC = () => {
             {activeTab === 'playing' && activeCampaign && (
               <div className="space-y-6">
                 <section>
-                  <h3 className="text-sm font-bold text-theme-text-muted uppercase tracking-wider mb-4">Quick Health Increments</h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-sm font-bold text-theme-text-muted uppercase tracking-wider">Quick Health Increments</h3>
+                  </div>
                   <div className="flex space-x-2">
                     {[0, 1, 2].map(idx => (
                       <input 
@@ -385,8 +403,11 @@ const SettingsDialog: React.FC = () => {
                         type="number" 
                         value={settings[SETTINGS_KEYS.PLAYING_HEALTH_INCREMENTS]?.[idx] || 0}
                         onChange={(e) => {
-                          const newVals = [...(settings[SETTINGS_KEYS.PLAYING_HEALTH_INCREMENTS] || [1, 3, 10])];
-                          newVals[idx] = parseInt(e.target.value);
+                          const val = parseInt(e.target.value);
+                          if (isNaN(val)) return;
+                          const newVals = [...(settings[SETTINGS_KEYS.PLAYING_HEALTH_INCREMENTS] || [1, 5, 10])];
+                          newVals[idx] = val;
+                          setSettings((prev: any) => ({ ...prev, [SETTINGS_KEYS.PLAYING_HEALTH_INCREMENTS]: newVals }));
                           updateCampaignSetting(SETTINGS_KEYS.PLAYING_HEALTH_INCREMENTS, newVals);
                         }}
                         className="bg-theme-bg border border-theme-border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-theme-primary w-full text-theme-text"
@@ -399,18 +420,18 @@ const SettingsDialog: React.FC = () => {
                   <h3 className="text-sm font-bold text-theme-text-muted uppercase tracking-wider mb-4">Layout Mode</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <button 
-                      onClick={() => updateCampaignSetting(SETTINGS_KEYS.PLAYING_LAYOUT_MODE, 'combat')}
-                      className={`p-4 rounded-xl border transition-all text-left ${settings[SETTINGS_KEYS.PLAYING_LAYOUT_MODE] === 'combat' ? 'bg-theme-primary/10 border-theme-primary' : 'bg-theme-bg border-theme-border hover:border-theme-primary'}`}
+                      onClick={() => updateCampaignSetting(SETTINGS_KEYS.PLAYING_LAYOUT_MODE, 'balanced')}
+                      className={`p-4 rounded-xl border transition-all text-left ${(!settings[SETTINGS_KEYS.PLAYING_LAYOUT_MODE] || settings[SETTINGS_KEYS.PLAYING_LAYOUT_MODE] === 'balanced') ? 'bg-theme-primary/10 border-theme-primary' : 'bg-theme-bg border-theme-border hover:border-theme-primary'}`}
                     >
-                      <div className="font-bold text-theme-text mb-1">Combat</div>
-                      <div className="text-[10px] text-theme-text-muted">Optimized for player tracking and status effects.</div>
+                      <div className="font-bold text-theme-text mb-1">Balanced</div>
+                      <div className="text-[10px] text-theme-text-muted">Mixed view of players and notes.</div>
                     </button>
                     <button 
                       onClick={() => updateCampaignSetting(SETTINGS_KEYS.PLAYING_LAYOUT_MODE, 'focused')}
                       className={`p-4 rounded-xl border transition-all text-left ${settings[SETTINGS_KEYS.PLAYING_LAYOUT_MODE] === 'focused' ? 'bg-theme-primary/10 border-theme-primary' : 'bg-theme-bg border-theme-border hover:border-theme-primary'}`}
                     >
                       <div className="font-bold text-theme-text mb-1">Focused</div>
-                      <div className="text-[10px] text-theme-text-muted">Heavy emphasis on session notes and lore.</div>
+                      <div className="text-[10px] text-theme-text-muted">Emphasis on notes and lore.</div>
                     </button>
                   </div>
                 </section>

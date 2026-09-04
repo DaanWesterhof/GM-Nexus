@@ -31,6 +31,11 @@ interface AppContextType {
   setTheme: (theme: string) => void;
   featureToggles: Record<string, boolean>;
   refreshFeatureToggles: () => Promise<void>;
+  playingSettings: {
+    healthIncrements: number[];
+    layoutMode: 'balanced' | 'focused';
+  };
+  refreshPlayingSettings: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -46,6 +51,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [theme, setThemeState] = useState<string>('dark');
   const [featureToggles, setFeatureToggles] = useState<Record<string, boolean>>({});
+  const [playingSettings, setPlayingSettings] = useState<{
+    healthIncrements: number[];
+    layoutMode: 'balanced' | 'focused';
+  }>({
+    healthIncrements: [1, 5, 10],
+    layoutMode: 'balanced'
+  });
+
+  const refreshPlayingSettings = useCallback(async () => {
+    if (activeCampaign) {
+      const { getCampaignSetting } = await import('../services/settingsService');
+      const [increments, layout] = await Promise.all([
+        getCampaignSetting(activeCampaign.id, SETTINGS_KEYS.PLAYING_HEALTH_INCREMENTS),
+        getCampaignSetting(activeCampaign.id, SETTINGS_KEYS.PLAYING_LAYOUT_MODE)
+      ]);
+      
+      setPlayingSettings({
+        healthIncrements: increments || [1, 5, 10],
+        layoutMode: layout || 'balanced'
+      });
+    }
+  }, [activeCampaign]);
 
   const refreshFeatureToggles = useCallback(async () => {
     if (activeCampaign) {
@@ -112,7 +139,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     refreshPlayers();
     refreshActiveSession();
     refreshFeatureToggles();
-  }, [refreshPlayers, refreshActiveSession, refreshFeatureToggles, entitiesRefreshTrigger]);
+    refreshPlayingSettings();
+  }, [refreshPlayers, refreshActiveSession, refreshFeatureToggles, refreshPlayingSettings, entitiesRefreshTrigger]);
 
   useEffect(() => {
     if (activeCampaign) {
@@ -165,7 +193,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       theme,
       setTheme,
       featureToggles,
-      refreshFeatureToggles
+      refreshFeatureToggles,
+      playingSettings,
+      refreshPlayingSettings
     }}>
       {children}
     </AppContext.Provider>

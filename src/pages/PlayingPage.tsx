@@ -11,7 +11,8 @@ import QuickAddCreatureModal from '../components/common/QuickAddCreatureModal';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 
 const PlayingPage: React.FC = () => {
-  const { activeCampaign, activeSession, setActiveSession, players, setCurrentView, setSelectedEntity, entitiesRefreshTrigger } = useAppContext();
+  const { activeCampaign, activeSession, setActiveSession, players, setCurrentView, setSelectedEntity, entitiesRefreshTrigger, playingSettings } = useAppContext();
+  const layoutMode = playingSettings.layoutMode;
   const [events, setEvents] = useState<SessionEvent[]>([]);
   const [newEventText, setNewEventText] = useState('');
   const [isBookOpen, setIsBookOpen] = useState(false);
@@ -214,108 +215,236 @@ const PlayingPage: React.FC = () => {
       </header>
 
       <div className="flex-1 flex overflow-hidden">
-        {/* Main Content: Player Cards */}
+        {/* Main Content */}
         <div className={`flex-1 overflow-auto p-8 transition-all duration-500 ${isBookOpen ? 'pr-4' : ''}`}>
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest">Players</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-            {players.map(player => (
-              <PlayerCard key={player.id} player={player} activeSessionId={activeSession.id} />
-            ))}
-            {players.length === 0 && (
-              <div className="col-span-full py-10 text-center border-2 border-dashed border-theme-border rounded-3xl bg-theme-bg-alt/30">
-                <p className="text-theme-text-muted italic text-sm">No players in this campaign yet.</p>
-              </div>
-            )}
-          </div>
-
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest">Scene Entities</h3>
-            <button 
-              onClick={() => {
-                setIsQuickAddCreatureOpen(true);
-              }}
-              className="bg-theme-primary/10 hover:bg-theme-primary/20 text-theme-primary px-3 py-1 rounded-lg text-[10px] font-black transition-all border border-theme-primary/20"
-            >
-              + QUICK ADD CREATURE
-            </button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-            {inSceneNpcs.map(npc => (
-              <CreatureCard 
-                key={npc.id} 
-                npc={npc} 
-                onUpdate={loadInSceneNpcs} 
-              />
-            ))}
-            {creatures.map(creature => (
-              <CreatureCard 
-                key={creature.id} 
-                creature={creature} 
-                onUpdate={loadCreatures} 
-                onDelete={() => handleDeleteCreature(creature.id)} 
-              />
-            ))}
-            {inSceneNpcs.length === 0 && creatures.length === 0 && (
-              <div className="col-span-full py-10 text-center border-2 border-dashed border-theme-border rounded-3xl bg-theme-bg-alt/30">
-                <p className="text-theme-text-muted italic text-sm">The scene is currently empty. Add creatures or select NPCs from the Campaign Book.</p>
-              </div>
-            )}
-          </div>
-          
-          {/* Session Footer Area */}
-          <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
-            {/* Events Log */}
-            <section className="bg-theme-bg-alt border border-theme-border rounded-2xl overflow-hidden flex flex-col h-[400px] shadow-lg">
-              <div className="px-6 py-4 border-b border-theme-border bg-theme-bg/50 flex justify-between items-center">
-                <h3 className="font-bold text-theme-text uppercase tracking-wider text-xs">Session Events</h3>
-              </div>
-              <div className="p-4 border-b border-theme-border">
-                <form onSubmit={handleAddEvent} className="flex space-x-2">
-                  <input 
-                    type="text"
-                    placeholder="What happened?..."
-                    value={newEventText}
-                    onChange={(e) => setNewEventText(e.target.value)}
-                    className="flex-1 bg-theme-bg border border-theme-border rounded-lg px-4 py-2 text-sm text-theme-text focus:outline-none focus:border-theme-primary transition-colors"
-                  />
-                  <button type="submit" className="bg-theme-primary hover:bg-theme-primary-hover text-theme-primary-text px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors">Add</button>
-                </form>
-              </div>
-              <div className="flex-1 overflow-auto p-4 space-y-4">
-                {events.map(event => (
-                  <div key={event.id} className="flex flex-col space-y-1">
-                    <div className="text-[10px] text-theme-text-muted">{new Date(event.timestamp).toLocaleTimeString()}</div>
-                    <div className="bg-theme-bg p-3 rounded-lg border border-theme-border text-sm text-theme-text shadow-sm">
-                      {event.text}
+          {layoutMode === 'focused' ? (
+            <div className="grid grid-cols-12 gap-8 h-full max-w-[1600px] mx-auto">
+              {/* Left Column: Players (Stacked) */}
+              <div className="col-span-3 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+                <div className="flex justify-between items-center sticky top-0 bg-theme-bg/80 backdrop-blur-md z-10 py-2">
+                  <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest">Players</h3>
+                </div>
+                <div className="flex flex-col gap-4">
+                  {players.map(player => (
+                    <div key={player.id} className="w-full">
+                      <PlayerCard player={player} activeSessionId={activeSession?.id} />
                     </div>
-                  </div>
-                ))}
-                {events.length === 0 && (
-                  <div className="text-center py-10 text-theme-text-muted italic text-sm">No events recorded yet.</div>
-                )}
+                  ))}
+                  {players.length === 0 && (
+                    <div className="py-10 text-center border-2 border-dashed border-theme-border rounded-3xl bg-theme-bg-alt/30">
+                      <p className="text-theme-text-muted italic text-xs">No players.</p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </section>
 
-            {/* Session Notes */}
-            <section className="bg-theme-bg-alt border border-theme-border rounded-2xl overflow-hidden flex flex-col h-[400px] shadow-lg">
-              <div className="px-6 py-4 border-b border-theme-border bg-theme-bg/50 flex justify-between items-center">
-                <h3 className="font-bold text-theme-text uppercase tracking-wider text-xs">Session Notes</h3>
-                <button 
-                  onClick={handleUpdateNotes}
-                  className="text-[10px] text-theme-primary hover:text-theme-primary-hover font-bold transition-colors"
-                >SAVE NOTES</button>
+              {/* Middle Column: Session Events and Notes */}
+              <div className="col-span-6 space-y-8 overflow-y-auto pr-2 custom-scrollbar">
+                {/* Events Log */}
+                <section className="bg-theme-bg-alt border border-theme-border rounded-2xl overflow-hidden flex flex-col shadow-lg h-[400px]">
+                  <div className="px-6 py-4 border-b border-theme-border bg-theme-bg/50 flex justify-between items-center">
+                    <h3 className="font-bold text-theme-text uppercase tracking-wider text-xs">Session Events</h3>
+                  </div>
+                  <div className="p-4 border-b border-theme-border">
+                    <form onSubmit={handleAddEvent} className="flex space-x-2">
+                      <input 
+                        type="text"
+                        placeholder="What happened?..."
+                        value={newEventText}
+                        onChange={(e) => setNewEventText(e.target.value)}
+                        className="flex-1 bg-theme-bg border border-theme-border rounded-lg px-4 py-2 text-sm text-theme-text focus:outline-none focus:border-theme-primary transition-colors"
+                      />
+                      <button type="submit" className="bg-theme-primary hover:bg-theme-primary-hover text-theme-primary-text px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors">Add</button>
+                    </form>
+                  </div>
+                  <div className="flex-1 overflow-auto p-4 space-y-4">
+                    {events.map(event => (
+                      <div key={event.id} className="flex flex-col space-y-1">
+                        <div className="text-[10px] text-theme-text-muted">{new Date(event.timestamp).toLocaleTimeString()}</div>
+                        <div className="bg-theme-bg p-3 rounded-lg border border-theme-border text-sm text-theme-text shadow-sm">
+                          {event.text}
+                        </div>
+                      </div>
+                    ))}
+                    {events.length === 0 && (
+                      <div className="text-center py-10 text-theme-text-muted italic text-sm">No events recorded yet.</div>
+                    )}
+                  </div>
+                </section>
+
+                {/* Session Notes */}
+                <section className="bg-theme-bg-alt border border-theme-border rounded-2xl overflow-hidden flex flex-col shadow-lg h-[600px]">
+                  <div className="px-6 py-4 border-b border-theme-border bg-theme-bg/50 flex justify-between items-center">
+                    <h3 className="font-bold text-theme-text uppercase tracking-wider text-xs">Session Notes</h3>
+                    <button 
+                      onClick={handleUpdateNotes}
+                      className="text-[10px] text-theme-primary hover:text-theme-primary-hover font-bold transition-colors"
+                    >SAVE NOTES</button>
+                  </div>
+                  <textarea 
+                    className="flex-1 bg-theme-bg p-6 text-theme-text focus:outline-none resize-none font-mono text-lg leading-relaxed"
+                    placeholder="Focus on the story here..."
+                    value={sessionNotes}
+                    onChange={(e) => setSessionNotes(e.target.value)}
+                    onBlur={handleUpdateNotes}
+                  />
+                </section>
               </div>
-              <textarea 
-                className="flex-1 bg-theme-bg p-6 text-theme-text focus:outline-none resize-none font-mono text-sm leading-relaxed"
-                placeholder="Private session notes, player thoughts, future hooks..."
-                value={sessionNotes}
-                onChange={(e) => setSessionNotes(e.target.value)}
-                onBlur={handleUpdateNotes}
-              />
-            </section>
-          </div>
+
+              {/* Right Column: NPCs and Creatures */}
+              <div className="col-span-3 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+                <div className="flex justify-between items-center sticky top-0 bg-theme-bg/80 backdrop-blur-md z-10 py-2">
+                  <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest">Scene Entities</h3>
+                  <button 
+                    onClick={() => setIsQuickAddCreatureOpen(true)}
+                    className="bg-theme-primary/10 hover:bg-theme-primary/20 text-theme-primary px-2 py-1 rounded-lg text-[9px] font-black transition-all border border-theme-primary/20"
+                  >
+                    + ADD
+                  </button>
+                </div>
+                <div className="flex flex-col gap-4">
+                  {inSceneNpcs.map(npc => (
+                    <CreatureCard key={npc.id} npc={npc} onUpdate={loadInSceneNpcs} />
+                  ))}
+                  {creatures.map(creature => (
+                    <CreatureCard 
+                      key={creature.id} 
+                      creature={creature} 
+                      onUpdate={loadCreatures} 
+                      onDelete={() => handleDeleteCreature(creature.id)} 
+                    />
+                  ))}
+                  {inSceneNpcs.length === 0 && creatures.length === 0 && (
+                    <div className="py-10 text-center border-2 border-dashed border-theme-border rounded-3xl bg-theme-bg-alt/30">
+                      <p className="text-theme-text-muted italic text-xs">The scene is empty.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className={`flex flex-col gap-8 ${layoutMode === 'focused' ? 'max-w-6xl mx-auto' : ''}`}>
+              
+              {/* Players Section */}
+              <section>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest">Players</h3>
+                </div>
+                <div className={`grid gap-6 ${
+                  layoutMode === 'focused'
+                      ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                      : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                }`}>
+                  {players.map(player => (
+                    <div key={player.id} className={layoutMode === 'focused' ? 'h-32' : ''}>
+                      <PlayerCard player={player} activeSessionId={activeSession?.id} />
+                    </div>
+                  ))}
+                  {players.length === 0 && (
+                    <div className="col-span-full py-10 text-center border-2 border-dashed border-theme-border rounded-3xl bg-theme-bg-alt/30">
+                      <p className="text-theme-text-muted italic text-sm">No players in this campaign yet.</p>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              {/* Scene Entities Section */}
+              <section>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest">Scene Entities</h3>
+                  <button 
+                    onClick={() => setIsQuickAddCreatureOpen(true)}
+                    className="bg-theme-primary/10 hover:bg-theme-primary/20 text-theme-primary px-3 py-1 rounded-lg text-[10px] font-black transition-all border border-theme-primary/20"
+                  >
+                    + QUICK ADD CREATURE
+                  </button>
+                </div>
+                <div className={`grid gap-6 ${
+                  layoutMode === 'focused'
+                      ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                      : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                }`}>
+                  {inSceneNpcs.map(npc => (
+                    <CreatureCard key={npc.id} npc={npc} onUpdate={loadInSceneNpcs} />
+                  ))}
+                  {creatures.map(creature => (
+                    <CreatureCard 
+                      key={creature.id} 
+                      creature={creature} 
+                      onUpdate={loadCreatures} 
+                      onDelete={() => handleDeleteCreature(creature.id)} 
+                    />
+                  ))}
+                  {inSceneNpcs.length === 0 && creatures.length === 0 && (
+                    <div className="col-span-full py-10 text-center border-2 border-dashed border-theme-border rounded-3xl bg-theme-bg-alt/30">
+                      <p className="text-theme-text-muted italic text-sm">The scene is currently empty.</p>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              {/* Logs & Notes Section */}
+              <div className={`grid gap-8 pb-12 ${
+                layoutMode === 'focused' 
+                  ? 'grid-cols-1' 
+                  : 'grid-cols-1 lg:grid-cols-2'
+              }`}>
+                {/* Events Log */}
+                <section className="bg-theme-bg-alt border border-theme-border rounded-2xl overflow-hidden flex flex-col shadow-lg h-[400px]">
+                  <div className="px-6 py-4 border-b border-theme-border bg-theme-bg/50 flex justify-between items-center">
+                    <h3 className="font-bold text-theme-text uppercase tracking-wider text-xs">Session Events</h3>
+                  </div>
+                  <div className="p-4 border-b border-theme-border">
+                    <form onSubmit={handleAddEvent} className="flex space-x-2">
+                      <input 
+                        type="text"
+                        placeholder="What happened?..."
+                        value={newEventText}
+                        onChange={(e) => setNewEventText(e.target.value)}
+                        className="flex-1 bg-theme-bg border border-theme-border rounded-lg px-4 py-2 text-sm text-theme-text focus:outline-none focus:border-theme-primary transition-colors"
+                      />
+                      <button type="submit" className="bg-theme-primary hover:bg-theme-primary-hover text-theme-primary-text px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors">Add</button>
+                    </form>
+                  </div>
+                  <div className="flex-1 overflow-auto p-4 space-y-4">
+                    {events.map(event => (
+                      <div key={event.id} className="flex flex-col space-y-1">
+                        <div className="text-[10px] text-theme-text-muted">{new Date(event.timestamp).toLocaleTimeString()}</div>
+                        <div className="bg-theme-bg p-3 rounded-lg border border-theme-border text-sm text-theme-text shadow-sm">
+                          {event.text}
+                        </div>
+                      </div>
+                    ))}
+                    {events.length === 0 && (
+                      <div className="text-center py-10 text-theme-text-muted italic text-sm">No events recorded yet.</div>
+                    )}
+                  </div>
+                </section>
+
+                {/* Session Notes */}
+                <section className={`bg-theme-bg-alt border border-theme-border rounded-2xl overflow-hidden flex flex-col shadow-lg ${
+                  layoutMode === 'focused' ? 'h-[600px]' : 'h-[400px]'
+                }`}>
+                  <div className="px-6 py-4 border-b border-theme-border bg-theme-bg/50 flex justify-between items-center">
+                    <h3 className="font-bold text-theme-text uppercase tracking-wider text-xs">Session Notes</h3>
+                    <button 
+                      onClick={handleUpdateNotes}
+                      className="text-[10px] text-theme-primary hover:text-theme-primary-hover font-bold transition-colors"
+                    >SAVE NOTES</button>
+                  </div>
+                  <textarea 
+                    className={`flex-1 bg-theme-bg p-6 text-theme-text focus:outline-none resize-none font-mono leading-relaxed ${
+                      layoutMode === 'focused' ? 'text-lg' : 'text-sm'
+                    }`}
+                    placeholder={layoutMode === 'focused' ? "Focus on the story here..." : "Private session notes..."}
+                    value={sessionNotes}
+                    onChange={(e) => setSessionNotes(e.target.value)}
+                    onBlur={handleUpdateNotes}
+                  />
+                </section>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Campaign Book Sidebar/Drawer */}

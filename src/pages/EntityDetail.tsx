@@ -7,7 +7,7 @@ import { getRelationshipWording } from '../constants/relationships';
 import { convertFileSrc } from '@tauri-apps/api/core';
 
 const EntityDetail: React.FC = () => {
-  const { selectedEntity, setSelectedEntity, activeCampaign, setCurrentView, refreshEntities } = useAppContext();
+  const { selectedEntity, setSelectedEntity, activeCampaign, setCurrentView, refreshEntities, playingSettings } = useAppContext();
   const [relationships, setRelationships] = useState<Relationship[]>([]);
   const [relatedEntities, setRelatedEntities] = useState<Record<string, CampaignEntity>>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -197,7 +197,7 @@ const EntityDetail: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-6 gap-2">
-                {[-10, -5, -1, 1, 5, 10].map(delta => (
+                {[...playingSettings.healthIncrements.map(v => -v).reverse(), ...playingSettings.healthIncrements].map(delta => (
                   <button
                     key={delta}
                     onClick={() => handleHealthChange(delta)}
