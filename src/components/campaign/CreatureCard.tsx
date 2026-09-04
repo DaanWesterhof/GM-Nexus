@@ -96,15 +96,17 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
   };
 
   const handleRemove = async () => {
-    setShowDeleteConfirm(true);
+    if (!isNpc && onDelete) {
+      onDelete();
+    } else {
+      setShowDeleteConfirm(true);
+    }
   };
 
   const confirmRemove = async () => {
     if (isNpc) {
       await entityService.update(entity.id, { inScene: false });
       onUpdate();
-    } else if (onDelete) {
-      onDelete();
     }
     setShowDeleteConfirm(false);
   };
