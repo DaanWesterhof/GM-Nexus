@@ -10,10 +10,9 @@ interface EntityManagerProps {
   type: 'Location' | 'Quest' | 'Faction';
   title: string;
   description: string;
-  icon: string;
 }
 
-const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, description, icon }) => {
+const EntityManager: React.FC<EntityManagerProps> = ({ campaign, type, title, description }) => {
   const [entities, setEntities] = useState<CampaignEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
