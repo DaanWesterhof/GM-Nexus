@@ -4,20 +4,19 @@ import { entityService } from '../../services/entityService';
 import { useAppContext } from '../../store/AppContext';
 
 const SearchOverlay: React.FC = () => {
-  const { activeCampaign, setSelectedEntity } = useAppContext();
+  const { activeCampaign, setSelectedEntity, isSearchOpen, setIsSearchOpen } = useAppContext();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<CampaignEntity[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        setIsOpen(true);
+        setIsSearchOpen(true);
       }
       if (e.key === 'Escape') {
-        setIsOpen(false);
+        setIsSearchOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -25,10 +24,10 @@ const SearchOverlay: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (isOpen && inputRef.current) {
+    if (isSearchOpen && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [isOpen]);
+  }, [isSearchOpen]);
 
   useEffect(() => {
     const performSearch = async () => {
@@ -44,7 +43,7 @@ const SearchOverlay: React.FC = () => {
     return () => clearTimeout(timer);
   }, [query, activeCampaign]);
 
-  if (!isOpen) return null;
+  if (!isSearchOpen) return null;
 
   return (
     <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-start justify-center p-4 md:pt-24">
@@ -65,7 +64,7 @@ const SearchOverlay: React.FC = () => {
             className="flex-1 bg-transparent text-xl text-white focus:outline-none placeholder-gray-600"
           />
           <button 
-            onClick={() => setIsOpen(false)}
+            onClick={() => setIsSearchOpen(false)}
             className="text-xs font-bold text-gray-500 hover:text-white border border-gray-700 px-2 py-1 rounded transition-colors"
           >
             ESC
@@ -80,7 +79,7 @@ const SearchOverlay: React.FC = () => {
                   key={entity.id}
                   onClick={() => {
                     setSelectedEntity(entity);
-                    setIsOpen(false);
+                    setIsSearchOpen(false);
                     setQuery('');
                   }}
                   className="w-full text-left p-4 rounded-xl hover:bg-blue-600 group flex items-center justify-between transition-all"
@@ -115,7 +114,7 @@ const SearchOverlay: React.FC = () => {
       </div>
       
       {/* Click outside to close */}
-      <div className="fixed inset-0 -z-10" onClick={() => setIsOpen(false)} />
+      <div className="fixed inset-0 -z-10" onClick={() => setIsSearchOpen(false)} />
     </div>
   );
 };

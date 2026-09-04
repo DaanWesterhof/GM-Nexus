@@ -8,7 +8,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { activeCampaign } = useAppContext();
+  const { activeCampaign, setIsSearchOpen } = useAppContext();
 
   return (
     <div className="h-screen bg-gray-900 text-white flex flex-col overflow-hidden">
@@ -28,9 +28,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <input 
               type="text" 
               placeholder="Search campaign..." 
-              className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-1.5 text-sm focus:outline-none focus:border-blue-500 w-64 transition-all"
+              className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-1.5 text-sm focus:outline-none focus:border-blue-500 w-64 transition-all cursor-pointer"
+              readOnly
+              onClick={() => setIsSearchOpen(true)}
             />
-            <span className="absolute right-3 top-2 text-gray-500 text-xs font-mono">⌘K</span>
+            <span className="absolute right-3 top-2 text-gray-500 text-xs font-mono pointer-events-none">⌘K</span>
           </div>
           <button className="text-gray-400 hover:text-white transition-colors">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
