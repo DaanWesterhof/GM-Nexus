@@ -12,7 +12,7 @@ import ConfirmDialog from '../components/common/ConfirmDialog';
 
 const PlayingPage: React.FC = () => {
   const { activeCampaign, activeSession, setActiveSession, players, setCurrentView, setSelectedEntity, entitiesRefreshTrigger, playingSettings } = useAppContext();
-  const layoutMode = playingSettings.layoutMode;
+  const layoutMode = playingSettings.layoutMode as string;
   const [events, setEvents] = useState<SessionEvent[]>([]);
   const [newEventText, setNewEventText] = useState('');
   const [isBookOpen, setIsBookOpen] = useState(false);

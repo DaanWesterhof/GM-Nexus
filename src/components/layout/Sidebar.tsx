@@ -11,19 +11,19 @@ interface NavItem {
 }
 
 const Sidebar: React.FC = () => {
-  const { currentView, setCurrentView, setActiveCampaign, activeCampaign, featureToggles } = useAppContext();
+  const { currentView, setCurrentView, setActiveCampaign, featureToggles } = useAppContext();
   const [quickAddType, setQuickAddType] = useState<EntityType | null>(null);
 
   const navItems: NavItem[] = [
-    { view: 'Playing', label: 'Playing', icon: '🎮' },
-    { view: 'Overview', label: 'Overview', icon: '🏠' },
-    { view: 'History', label: 'History', icon: '📜' },
-    { view: 'NPCs', label: 'NPCs', icon: '👤' },
-    { view: 'Locations', label: 'Locations', icon: '📍' },
-    { view: 'Quests', label: 'Quests', icon: '📜' },
-    { view: 'Factions', label: 'Factions', icon: '🛡️' },
-    { view: 'Notes', label: 'Notes', icon: '📝' },
-    { view: 'Inbox', label: 'Inbox', icon: '📥' },
+    { view: 'Playing' as View, label: 'Playing', icon: '🎮' },
+    { view: 'Overview' as View, label: 'Overview', icon: '🏠' },
+    { view: 'History' as View, label: 'History', icon: '📜' },
+    { view: 'NPCs' as View, label: 'NPCs', icon: '👤' },
+    { view: 'Locations' as View, label: 'Locations', icon: '📍' },
+    { view: 'Quests' as View, label: 'Quests', icon: '📜' },
+    { view: 'Factions' as View, label: 'Factions', icon: '🛡️' },
+    { view: 'Notes' as View, label: 'Notes', icon: '📝' },
+    { view: 'Inbox' as View, label: 'Inbox', icon: '📥' },
   ].filter(item => {
     // If it's a togglable feature, check if it's enabled
     if (['Factions', 'Quests', 'Inbox', 'History'].includes(item.label)) {
