@@ -24,6 +24,8 @@ interface AppContextType {
   entitiesRefreshTrigger: number;
   isSearchOpen: boolean;
   setIsSearchOpen: (isOpen: boolean) => void;
+  isSettingsOpen: boolean;
+  setIsSettingsOpen: (isOpen: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -36,6 +38,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [players, setPlayers] = useState<Player[]>([]);
   const [entitiesRefreshTrigger, setEntitiesRefreshTrigger] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const refreshPlayers = useCallback(async () => {
     if (activeCampaign) {
@@ -109,7 +112,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       refreshEntities,
       entitiesRefreshTrigger,
       isSearchOpen,
-      setIsSearchOpen
+      setIsSearchOpen,
+      isSettingsOpen,
+      setIsSettingsOpen
     }}>
       {children}
     </AppContext.Provider>

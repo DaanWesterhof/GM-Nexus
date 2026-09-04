@@ -20,6 +20,7 @@ use tokio::sync::broadcast;
 use tauri::{Emitter, Manager};
 use tower_http::cors::CorsLayer;
 use tower_http::services::ServeDir;
+use tokio::sync::Mutex;
 
 /// Name of the resource directory the built frontend (`dist`) is copied into.
 /// Must match the `bundle.resources` mapping in `tauri.conf.json`.
@@ -74,9 +75,10 @@ fn resolve_overlay_dist_dir(app_handle: &tauri::AppHandle) -> Option<PathBuf> {
 pub struct WsState {
     pub tx: broadcast::Sender<String>,
     pub app_handle: tauri::AppHandle,
+    pub server_handle: Mutex<Option<tokio::task::JoinHandle<()>>>,
 }
 
-pub async fn start_server(state: Arc<WsState>) {
+pub async fn start_server(state: Arc<WsState>, port: u16) {
     let overlay_dist_dir = resolve_overlay_dist_dir(&state.app_handle);
 
     let mut app = Router::new()
@@ -93,7 +95,7 @@ pub async fn start_server(state: Arc<WsState>) {
         app = app.fallback(overlay_unavailable_handler);
     }
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3030));
+    let addr = SocketAddr::from(([127, 0, 0, 1], port));
     println!("Server listening on: {}", addr);
     let listener = match tokio::net::TcpListener::bind(&addr).await {
         Ok(listener) => listener,

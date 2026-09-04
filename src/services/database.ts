@@ -1,4 +1,5 @@
 import Database from '@tauri-apps/plugin-sql';
+import { invoke } from '@tauri-apps/api/core';
 
 let db: Database | null = null;
 
@@ -217,4 +218,26 @@ export const initializeDatabase = async () => {
   try {
     await database.execute('ALTER TABLE creatures ADD COLUMN statusEffects TEXT');
   } catch (e) { /* ignore */ }
+
+  await database.execute(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      campaignId TEXT,
+      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (campaignId) REFERENCES campaigns (id) ON DELETE CASCADE
+    );
+  `);
+};
+
+export const exportDatabase = async (): Promise<string> => {
+  return await invoke('export_database_file');
+};
+
+export const getImportPreview = async (path: string): Promise<[string, string][]> => {
+  return await invoke('get_import_preview', { path });
+};
+
+export const importCampaigns = async (sourcePath: string, selectedIds: string[]): Promise<void> => {
+  await invoke('import_campaigns', { sourcePath, selectedIds });
 };
