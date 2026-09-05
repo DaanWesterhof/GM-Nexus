@@ -7,9 +7,10 @@ interface QuickAddModalProps {
   isOpen: boolean;
   onClose: () => void;
   type: EntityType;
+  onAdded?: (entity: CampaignEntity) => void;
 }
 
-const QuickAddModal: React.FC<QuickAddModalProps> = ({ isOpen, onClose, type }) => {
+const QuickAddModal: React.FC<QuickAddModalProps> = ({ isOpen, onClose, type, onAdded }) => {
   const { activeCampaign, setSelectedEntity, refreshEntities } = useAppContext();
   const [name, setName] = useState('');
   const [health, setHealth] = useState('10');
@@ -44,7 +45,10 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({ isOpen, onClose, type }) 
     try {
       await entityService.create(newEntity as any);
       const created = await entityService.getById(newId);
-      if (created) {
+      
+      if (onAdded && created) {
+        onAdded(created);
+      } else if (created) {
         setSelectedEntity(created);
       }
       

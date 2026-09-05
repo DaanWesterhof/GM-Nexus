@@ -586,6 +586,14 @@ const PlayingPage: React.FC = () => {
         type={quickAddType || 'NPC'} 
         isOpen={!!quickAddType} 
         onClose={() => setQuickAddType(null)} 
+        onAdded={() => {
+          if (bookSubView === quickAddType) {
+            loadEntities();
+          }
+          if (quickAddType === 'NPC') {
+            loadInSceneNpcs();
+          }
+        }}
       />
 
       <QuickAddCreatureModal 

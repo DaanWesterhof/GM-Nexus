@@ -144,6 +144,10 @@ const CampaignOverview: React.FC<CampaignOverviewProps> = ({ campaign }) => {
         type={quickAddType || 'NPC'} 
         isOpen={!!quickAddType} 
         onClose={() => setQuickAddType(null)} 
+        onAdded={(created) => {
+          // In Overview, we want to go to details after adding
+          setSelectedEntity(created);
+        }}
       />
     </div>
   );

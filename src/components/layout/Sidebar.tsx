@@ -121,6 +121,14 @@ const Sidebar: React.FC = () => {
         type={quickAddType || 'NPC'} 
         isOpen={!!quickAddType} 
         onClose={() => setQuickAddType(null)} 
+        onAdded={(created) => {
+          if (currentView === 'Playing') {
+            // Stay on Playing page, but refresh if needed (AppContext handles broadcast)
+            return;
+          }
+          // Default behavior for other pages: go to detail
+          setSelectedEntity(created);
+        }}
       />
     </aside>
   );
