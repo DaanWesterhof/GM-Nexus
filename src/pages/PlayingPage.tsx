@@ -218,9 +218,9 @@ const PlayingPage: React.FC = () => {
         {/* Main Content */}
         <div className={`flex-1 overflow-auto p-8 transition-all duration-500 ${isBookOpen ? 'pr-4' : ''}`}>
           {layoutMode === 'focused' ? (
-            <div className="grid grid-cols-12 gap-8 h-full max-w-[1600px] mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full max-w-[1600px] mx-auto">
               {/* Left Column: Players (Stacked) */}
-              <div className="col-span-3 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+              <div className="lg:col-span-4 xl:col-span-3 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
                 <div className="flex justify-between items-center sticky top-0 bg-theme-bg/80 backdrop-blur-md z-10 py-2">
                   <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest">Players</h3>
                 </div>
@@ -236,10 +236,41 @@ const PlayingPage: React.FC = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Scene Entities (Moved below Players when screen is small) */}
+                <div className="xl:hidden space-y-6 mt-8">
+                  <div className="flex justify-between items-center sticky top-0 bg-theme-bg/80 backdrop-blur-md z-10 py-2">
+                    <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest">Scene Entities</h3>
+                    <button 
+                      onClick={() => setIsQuickAddCreatureOpen(true)}
+                      className="bg-theme-primary/10 hover:bg-theme-primary/20 text-theme-primary px-2 py-1 rounded-lg text-[9px] font-black transition-all border border-theme-primary/20"
+                    >
+                      + ADD
+                    </button>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    {inSceneNpcs.map(npc => (
+                      <CreatureCard key={npc.id} npc={npc} onUpdate={loadInSceneNpcs} />
+                    ))}
+                    {creatures.map(creature => (
+                      <CreatureCard 
+                        key={creature.id} 
+                        creature={creature} 
+                        onUpdate={loadCreatures} 
+                        onDelete={() => handleDeleteCreature(creature.id)} 
+                      />
+                    ))}
+                    {inSceneNpcs.length === 0 && creatures.length === 0 && (
+                      <div className="py-10 text-center border-2 border-dashed border-theme-border rounded-3xl bg-theme-bg-alt/30">
+                        <p className="text-theme-text-muted italic text-xs">The scene is empty.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* Middle Column: Session Events and Notes */}
-              <div className="col-span-6 space-y-8 overflow-y-auto pr-2 custom-scrollbar">
+              <div className="lg:col-span-8 xl:col-span-6 space-y-8 overflow-y-auto pr-2 custom-scrollbar">
                 {/* Events Log */}
                 <section className="bg-theme-bg-alt border border-theme-border rounded-2xl overflow-hidden flex flex-col shadow-lg h-[400px]">
                   <div className="px-6 py-4 border-b border-theme-border bg-theme-bg/50 flex justify-between items-center">
@@ -292,7 +323,7 @@ const PlayingPage: React.FC = () => {
               </div>
 
               {/* Right Column: NPCs and Creatures */}
-              <div className="col-span-3 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+              <div className="hidden xl:block col-span-3 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
                 <div className="flex justify-between items-center sticky top-0 bg-theme-bg/80 backdrop-blur-md z-10 py-2">
                   <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest">Scene Entities</h3>
                   <button 
