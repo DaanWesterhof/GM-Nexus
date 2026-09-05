@@ -9,7 +9,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { activeCampaign, setIsSearchOpen, setIsSettingsOpen } = useAppContext();
+  const { activeCampaign, setIsSearchOpen, setIsSettingsOpen, isSidebarCollapsed } = useAppContext();
 
   return (
     <div className="h-screen bg-theme-bg text-theme-text flex flex-col overflow-hidden transition-colors">
@@ -19,7 +19,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="flex items-center space-x-4">
           <h1 className="text-xl font-black tracking-tighter text-theme-primary">GM NEXUS</h1>
           {activeCampaign && (
-            <div className="flex items-center space-x-2">
+            <div className={`flex items-center space-x-2 transition-all duration-300 ${isSidebarCollapsed ? 'ml-4' : 'ml-0'}`}>
               <span className="text-theme-text-muted">/</span>
               <span className="text-theme-text font-medium">{activeCampaign.name}</span>
             </div>

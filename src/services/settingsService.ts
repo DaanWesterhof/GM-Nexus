@@ -14,6 +14,7 @@ export const SETTINGS_KEYS = {
   WS_FREQUENCY: 'ws_frequency',
   WS_OVERLAY_THEME: 'ws_overlay_theme',
   DATABASE_AUTO_SAVE_INTERVAL: 'database_auto_save_interval',
+  SIDEBAR_COLLAPSED: 'sidebar_collapsed',
 
   // Campaign Settings
   CAMPAIGN_GAME_SYSTEM: 'campaign_game_system',

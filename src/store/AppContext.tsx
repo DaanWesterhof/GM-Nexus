@@ -36,6 +36,8 @@ interface AppContextType {
     layoutMode: 'balanced' | 'focused';
   };
   refreshPlayingSettings: () => Promise<void>;
+  isSidebarCollapsed: boolean;
+  setIsSidebarCollapsed: (isCollapsed: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -58,6 +60,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     healthIncrements: [1, 5, 10],
     layoutMode: 'balanced'
   });
+  const [isSidebarCollapsed, setIsSidebarCollapsedState] = useState(false);
 
   const refreshPlayingSettings = useCallback(async () => {
     if (activeCampaign) {
@@ -100,17 +103,29 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     await setGlobalSetting(SETTINGS_KEYS.APP_APPEARANCE, newTheme);
   }, []);
 
+  const setIsSidebarCollapsed = useCallback(async (isCollapsed: boolean) => {
+    setIsSidebarCollapsedState(isCollapsed);
+    await setGlobalSetting(SETTINGS_KEYS.SIDEBAR_COLLAPSED, isCollapsed);
+  }, []);
+
   useEffect(() => {
-    const initTheme = async () => {
-      const savedTheme = await getGlobalSetting(SETTINGS_KEYS.APP_APPEARANCE);
+    const initSettings = async () => {
+      const [savedTheme, savedSidebarCollapsed] = await Promise.all([
+        getGlobalSetting(SETTINGS_KEYS.APP_APPEARANCE),
+        getGlobalSetting(SETTINGS_KEYS.SIDEBAR_COLLAPSED)
+      ]);
+
       if (savedTheme) {
         setTheme(savedTheme);
       } else {
-        // Default to dark if not set
         setTheme('dark');
       }
+
+      if (savedSidebarCollapsed !== null) {
+        setIsSidebarCollapsedState(!!savedSidebarCollapsed);
+      }
     };
-    initTheme();
+    initSettings();
   }, [setTheme]);
 
   const refreshPlayers = useCallback(async () => {
@@ -195,7 +210,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       featureToggles,
       refreshFeatureToggles,
       playingSettings,
-      refreshPlayingSettings
+      refreshPlayingSettings,
+      isSidebarCollapsed,
+      setIsSidebarCollapsed
     }}>
       {children}
     </AppContext.Provider>
