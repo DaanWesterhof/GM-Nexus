@@ -74,6 +74,17 @@ const EntityDetail: React.FC = () => {
     await handleSave({ currentHealth: newValue });
   };
 
+  const handleDirectEdit = async (value: string) => {
+    const numValue = parseInt(value);
+    if (isNaN(numValue)) return;
+
+    let newValue = numValue;
+    if (newValue < 0) newValue = 0;
+    if (newValue > (selectedEntity.maxHealth || 0)) newValue = selectedEntity.maxHealth || 0;
+
+    await handleSave({ currentHealth: newValue });
+  };
+
   const handleAddStatus = async () => {
     if (!newStatusName.trim()) return;
     await handleStatusEffectChange(newStatusName, 'add');
@@ -181,7 +192,12 @@ const EntityDetail: React.FC = () => {
               <div className="flex justify-between items-end mb-4">
                 <span className="text-sm font-black text-theme-text-muted uppercase tracking-widest">Health</span>
                 <div className="flex items-center space-x-2">
-                  <span className="text-3xl font-black text-theme-text">{selectedEntity.currentHealth}</span>
+                  <input
+                    type="number"
+                    value={selectedEntity.currentHealth}
+                    onChange={(e) => handleDirectEdit(e.target.value)}
+                    className="w-24 bg-transparent text-right font-black text-theme-text focus:outline-none focus:bg-theme-bg rounded transition-colors text-3xl"
+                  />
                   <span className="text-theme-text-muted font-bold">/ {selectedEntity.maxHealth}</span>
                 </div>
               </div>

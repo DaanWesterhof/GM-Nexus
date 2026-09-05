@@ -16,9 +16,15 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
   const [statusEffects, setStatusEffects] = useState<StatusEffect[]>([]);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [newStatusName, setNewStatusName] = useState('');
+  const [resourceScrollOffset, setResourceScrollOffset] = useState(0);
 
   useEffect(() => {
     loadPlayerData();
+  }, [player.id]);
+
+  // Reset scroll when switching players or if resources change significantly
+  useEffect(() => {
+    setResourceScrollOffset(0);
   }, [player.id]);
 
   const loadPlayerData = async () => {
@@ -118,10 +124,11 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
   const otherResources = resources.filter(r => r.id !== health?.id);
   
   const renderResource = (res: PlayerResource, isHealth: boolean = false) => {
+    const isFocused = playingSettings.layoutMode === 'focused';
     return (
-      <div key={res.id} className={playingSettings.layoutMode === 'focused' ? 'space-y-1' : 'space-y-2'}>
+      <div key={res.id} className={isFocused ? 'space-y-1' : 'space-y-2'}>
         <div className="flex justify-between items-end">
-          <span className={`font-bold uppercase tracking-widest ${playingSettings.layoutMode === 'focused' ? 'text-[10px]' : 'text-xs'} ${isHealth ? 'text-theme-text-muted' : 'text-theme-primary'}`}>
+          <span className={`font-bold uppercase tracking-widest ${isFocused ? 'text-[10px]' : 'text-xs'} ${isHealth ? 'text-theme-text-muted' : 'text-theme-primary'}`}>
             {res.name}
           </span>
           <div className="flex items-center space-x-1">
@@ -129,14 +136,14 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
               type="number"
               value={res.currentValue}
               onChange={(e) => handleDirectEdit(res.id, e.target.value)}
-              className={`w-10 bg-transparent text-right font-bold text-theme-text focus:outline-none focus:bg-theme-bg rounded transition-colors ${playingSettings.layoutMode === 'focused' ? 'text-base' : 'text-xl'}`}
+              className={`w-16 bg-transparent text-right font-bold text-theme-text focus:outline-none focus:bg-theme-bg rounded transition-colors ${isFocused ? 'text-base' : 'text-xl'}`}
             />
-            <span className={`text-theme-text-muted ${playingSettings.layoutMode === 'focused' ? 'text-[10px]' : 'text-sm'}`}>/ {res.maxValue}</span>
+            <span className={`text-theme-text-muted ${isFocused ? 'text-[10px]' : 'text-sm'}`}>/ {res.maxValue}</span>
           </div>
         </div>
         
         {/* Resource Bar */}
-        <div className={`${playingSettings.layoutMode === 'focused' ? 'h-2' : 'h-4'} bg-theme-bg rounded-full overflow-hidden border border-theme-border shadow-inner`}>
+        <div className={`${isFocused ? 'h-2' : 'h-4'} bg-theme-bg rounded-full overflow-hidden border border-theme-border shadow-inner`}>
           <div 
             className={`h-full transition-all duration-300 ${
               isHealth && !res.color
@@ -152,12 +159,12 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
         </div>
 
         {/* Quick Buttons */}
-        <div className={`grid grid-cols-6 gap-1 mt-2 ${playingSettings.layoutMode === 'focused' ? 'scale-90 origin-left' : ''}`}>
+        <div className={`grid grid-cols-6 gap-1 mt-2 ${isFocused ? 'scale-90 origin-left' : ''}`}>
           {[...playingSettings.healthIncrements.map(v => -v).reverse(), ...playingSettings.healthIncrements].map(delta => (
             <button
               key={delta}
               onClick={() => handleHealthChange(res.id, delta)}
-              className={`${playingSettings.layoutMode === 'focused' ? 'py-1 text-[9px]' : 'py-2 text-[10px]'} rounded-lg font-black transition-all shadow-sm ${
+              className={`${isFocused ? 'py-1 text-[9px]' : 'py-2 text-[10px]'} rounded-lg font-black transition-all shadow-sm ${
                 delta < 0 
                   ? 'bg-red-600/10 text-red-500 hover:bg-red-600/20 border border-red-600/30' 
                   : 'bg-green-600/10 text-green-500 hover:bg-green-600/20 border border-green-600/30'
@@ -211,16 +218,50 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
         )}
       </div>
 
-      <div className={`p-4 flex-1 flex flex-col min-w-0 ${playingSettings.layoutMode === 'focused' ? 'justify-center space-y-2' : 'space-y-6'}`}>
-        {/* Health Section */}
-        {health && renderResource(health, true)}
-
-        {/* Other Resources */}
-        {otherResources.length > 0 && (
-          <div className={playingSettings.layoutMode === 'focused' ? 'space-y-2' : 'space-y-6'}>
-            {otherResources.map(res => renderResource(res, false))}
+      <div className={`p-4 flex-1 flex flex-col min-w-0 ${playingSettings.layoutMode === 'focused' ? 'justify-center' : 'space-y-6'}`}>
+        <div className="flex flex-row items-center">
+          <div className="flex-1 flex flex-col min-w-0 justify-center">
+            {playingSettings.layoutMode === 'focused' ? (
+              <div className="flex-1 flex flex-col justify-center">
+                {resources.length > 0 && renderResource(resources[resourceScrollOffset % resources.length])}
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {resources.slice(resourceScrollOffset, resourceScrollOffset + 3).map(res => renderResource(res, res.name.toLowerCase() === 'health' || res.name.toLowerCase() === 'hp'))}
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Scroll Buttons */}
+          {((playingSettings.layoutMode === 'focused' && resources.length > 1) || 
+            (playingSettings.layoutMode === 'balanced' && resources.length > 3)) && (
+            <div className="ml-2 flex flex-col space-y-1 self-center">
+              <button 
+                onClick={() => setResourceScrollOffset(prev => Math.max(0, prev - 1))}
+                disabled={resourceScrollOffset === 0}
+                className={`p-1 hover:bg-theme-bg-alt rounded transition-colors text-theme-text-muted hover:text-theme-primary disabled:opacity-20 disabled:cursor-not-allowed`}
+                title="Scroll Up"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 15l7-7 7 7" />
+                </svg>
+              </button>
+              <button 
+                onClick={() => setResourceScrollOffset(prev => {
+                  const maxOffset = playingSettings.layoutMode === 'focused' ? resources.length - 1 : resources.length - 3;
+                  return Math.min(maxOffset, prev + 1);
+                })}
+                disabled={resourceScrollOffset >= (playingSettings.layoutMode === 'focused' ? resources.length - 1 : resources.length - 3)}
+                className={`p-1 hover:bg-theme-bg-alt rounded transition-colors text-theme-text-muted hover:text-theme-primary disabled:opacity-20 disabled:cursor-not-allowed`}
+                title="Scroll Down"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Status Effects */}
         {playingSettings.layoutMode !== 'focused' && (

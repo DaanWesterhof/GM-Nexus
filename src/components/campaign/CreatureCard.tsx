@@ -187,7 +187,7 @@ const CreatureCard: React.FC<CreatureCardProps> = ({ creature, npc, onUpdate, on
                 type="number"
                 value={currentHealth}
                 onChange={(e) => handleDirectEdit(e.target.value)}
-                className={`w-10 bg-transparent text-right font-bold text-theme-text focus:outline-none focus:bg-theme-bg rounded transition-colors ${playingSettings.layoutMode === 'focused' ? 'text-sm' : 'text-xl'}`}
+                className={`w-16 bg-transparent text-right font-bold text-theme-text focus:outline-none focus:bg-theme-bg rounded transition-colors ${playingSettings.layoutMode === 'focused' ? 'text-sm' : 'text-xl'}`}
               />
               <span className={`text-theme-text-muted ${playingSettings.layoutMode === 'focused' ? 'text-[10px]' : 'text-sm'}`}>/ {maxHealth}</span>
             </div>
