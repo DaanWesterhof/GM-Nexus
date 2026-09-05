@@ -120,9 +120,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, activeSessionId }) => {
     }
   };
 
-  const health = resources.find(r => r.name.toLowerCase() === 'health' || r.name.toLowerCase() === 'hp');
-  const otherResources = resources.filter(r => r.id !== health?.id);
-  
+
   const renderResource = (res: PlayerResource, isHealth: boolean = false) => {
     const isFocused = playingSettings.layoutMode === 'focused';
     return (

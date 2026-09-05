@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EntityType } from '../../types';
+import { EntityType, CampaignEntity } from '../../types';
 import { entityService } from '../../services/entityService';
 import { useAppContext } from '../../store/AppContext';
 
