@@ -64,3 +64,23 @@ GM Nexus includes a built-in HTTP/WebSocket server (running on `http://127.0.0.1
 - `npm run build`: Builds the frontend and prepares for production.
 - `npm run tauri dev`: Runs the Tauri app in a debug window with hot-reloading.
 - `npm run tauri build`: Packages the app for distribution.
+
+# Some pictures of the current application
+
+<img width="2878" height="1447" alt="playing" src="https://github.com/user-attachments/assets/3a081259-e34c-40cb-93d8-757624548e6b" />
+
+<img width="2878" height="1447" alt="playing_focused" src="https://github.com/user-attachments/assets/fcac1663-662a-4041-9137-f80b21197e11" />
+
+<img width="1681" height="1159" alt="relationships" src="https://github.com/user-attachments/assets/fef7cb6a-db5d-4da5-82e1-7f39661662db" />
+
+<img width="2878" height="1456" alt="overview" src="https://github.com/user-attachments/assets/dd0c64bd-a815-4ef6-a0de-3be0b2f46649" />
+
+<img width="2878" height="1453" alt="history" src="https://github.com/user-attachments/assets/f18fb7aa-f3f5-4227-81a2-e41795b9c1ac" />
+
+<img width="1194" height="841" alt="menu" src="https://github.com/user-attachments/assets/e7f4b17c-c06d-4b66-8e0e-5969f44e91e7" />
+
+<img width="2863" height="1452" alt="warm_oak" src="https://github.com/user-attachments/assets/c097d907-41d2-43d2-a2c5-f4ac40b099f5" />
+
+<img width="2878" height="1456" alt="light_mode" src="https://github.com/user-attachments/assets/b1cdc7f9-398f-4930-b482-0329fa1317f2" />
+
+<img width="1776" height="1204" alt="capaign_book" src="https://github.com/user-attachments/assets/6bc582f1-5323-4ea8-87eb-ecee2c0bca7e" />
