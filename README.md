@@ -6,19 +6,25 @@
 > [!IMPORTANT]  
 > No generative ai was used to create the logo. i did that with gimp and pixabay :)
 
-GM Nexus is a powerful tool designed for Tabletop RPG Game Masters to manage their campaigns, track game state, and enhance their livestreams with automated overlays. Built with Tauri, React, and Rust, it offers a fast, local-first experience with deep OBS integration.
+GM Nexus is a tool designed for Tabletop RPG Game Masters to manage their campaigns and track game state. Its main focus is to be able to track state between games an have an organised space for notes, npc's, locations, quests, factions and players. It helps managing health of players, npc's and enemies in combat. Allows you to track custom resources and even offers an overlay for obs if you want to stream or record the campaign. 
+Its perfect for your next D&D, URealms, STA or other TTRPG session! 
 
 ## Key Features
 
 - **Campaign Management**: Create and switch between multiple TTRPG campaigns.
-- **Entity Tracking**: Detailed management for NPCs, Locations, Quests, and Factions.
+- **Entity Tracking**: Management for NPCs, Locations, Quests, and Factions.
 - **Session History**: Keep track of what happened in previous sessions.
-- **Player & NPC Portraits**: Manage character imagery that syncs directly to your stream.
-- **Live OBS Overlay**: An integrated Axum server provides real-time updates to your OBS scene via WebSockets.
+- **Player & NPC Portraits**: Manage character imagery.
+- **Live OBS Overlay**: An browser source for OBS or other streaming/recording tool.
 - **Local-First & Secure**: Your data stays on your machine, utilizing a local SQLite database.
 
-## Getting Started
 
+## User instalation
+### Express instalation
+For windows you can download and install the latest release via the releases page. Just download the .msi or .exe and it should work out of the box.
+
+
+## Custom instalation/development
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) (latest LTS recommended)
